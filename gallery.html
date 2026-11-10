@@ -379,6 +379,14 @@ body.flat .after{padding-top:8rem;background:none}
 
   const top=document.querySelector('.top'),ovs=[...document.querySelectorAll('.ov')],count=document.getElementById('count'),cb=count.querySelector('b');
   const workStops=[2,3,5,6],artStops=[2,3,5,6,7];
+  /* analytics: which stops visitors reach, Read more taps, and leaving the gallery */
+  const STOP_NAMES=['entrance','sanad_strategies','toastella','nostalgia','the_pillar','pulse','sweet_batter','your_brand'];
+  const track=(ev,props)=>{try{if(window.posthog&&posthog.capture)posthog.capture(ev,props)}catch(e){}};
+  let reported=-1,furthest=0,leftSent=false;
+  document.querySelectorAll('.cap .more, .static .more').forEach(a=>a.addEventListener('click',()=>{
+    const cap=a.closest('[data-k]'),k=cap?+cap.dataset.k:-1;
+    track('read_more_click',{project:k>=0?STOP_NAMES[k]:(a.closest('div').querySelector('h3')||{}).textContent,url:a.href});
+  }));
   const born=performance.now(),ramp=(t,d)=>Math.max(0,Math.min(1,(t-d)/1.2));
   const hemi=scene.children.find(o=>o.isHemisphereLight),oBase=oculus.intensity,wBase=warm.intensity;
   const fine=matchMedia('(pointer:fine)').matches;let tx=0,ty=0,lx=0,ly=0;
@@ -390,6 +398,9 @@ body.flat .after{padding-top:8rem;background:none}
     const dt=Math.min(.05,(now-last)/1000);last=now;
     const p=prog(),f=p*N,s=stopAt(f),k=1-Math.exp(-dt*4);
     const past=Math.max(0,Math.min(1,(innerHeight-tour.getBoundingClientRect().bottom)/(innerHeight*.35)));
+    {const kk=Math.round(f);if(Math.abs(f-kk)<.06&&kk!==reported&&past<.5){reported=kk;furthest=Math.max(furthest,kk);track('gallery_stop_reached',{stop:STOP_NAMES[kk],stop_index:kk})}
+     if(past>.5&&!leftSent){leftSent=true;track('gallery_left',{furthest_stop:STOP_NAMES[furthest],furthest_index:furthest})}
+     if(past<.1)leftSent=false}
     pos.lerp(s.p,k);look.lerp(s.l,k);cam.position.copy(pos);
     // a slight lean toward the cursor on desktop (about 1-2 degrees), never a roll
     lx+=(tx-lx)*k*.6;ly+=(ty-ly)*k*.6;fwd.subVectors(look,pos).normalize();side.crossVectors(fwd,UP).normalize();
