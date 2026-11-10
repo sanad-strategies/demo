@@ -43,6 +43,7 @@ a{color:inherit;text-decoration:none}
 .ov{position:fixed;z-index:10;opacity:0;pointer-events:none;will-change:opacity,transform}
 .ov.on{pointer-events:auto}
 .cap{left:max(22px,6vw);bottom:max(9vh,90px);max-width:min(520px,calc(100% - 44px))}
+.cap.r{left:auto;right:max(22px,6vw);text-align:right}.cap.r .d{margin-left:auto}
 .cap .k{font:400 .7rem var(--sans);letter-spacing:.24em;text-transform:uppercase;color:var(--mut);margin-bottom:.9rem}
 .cap h2{font:400 clamp(2rem,4.6vw,3.6rem)/1.08 var(--serif);text-transform:uppercase;letter-spacing:.04em}
 .cap .d{font:300 .95rem/1.65 var(--sans);color:var(--mut);margin:.9rem 0 1.2rem;max-width:44ch}
@@ -58,6 +59,12 @@ a{color:inherit;text-decoration:none}
 .btn:hover{background:var(--ink);color:#0b0b0d}
 .count{position:fixed;z-index:10;right:max(22px,4vw);bottom:max(9vh,90px);font:400 .72rem var(--sans);letter-spacing:.2em;color:var(--mut);opacity:0}
 .count b{font-weight:400;color:var(--ink)}
+.map{position:fixed;z-index:10;right:max(22px,4vw);top:calc(84px + env(safe-area-inset-top,0px));width:84px;height:84px;opacity:0;pointer-events:none}
+.m-wall{fill:rgba(6,6,8,.45);stroke:rgba(236,231,221,.28);stroke-width:1;stroke-dasharray:198 28;stroke-dashoffset:-14}
+.m-ring{fill:none;stroke:rgba(236,231,221,.12);stroke-width:1}
+.m-centre{fill:var(--gold)}
+.m-n{fill:rgba(236,231,221,.35)}.m-n.on{fill:var(--gold)}.m-n.empty{fill:none;stroke:var(--gold);stroke-width:1}
+.m-me{fill:var(--ink)}
 
 /* after the tour */
 .after{position:relative;z-index:3;background:linear-gradient(to bottom,rgba(6,6,8,0),rgba(6,6,8,.92) 30vh,var(--bg) 60vh);padding:40vh max(22px,6vw) 6rem}
@@ -90,7 +97,9 @@ body.flat .after{padding-top:8rem;background:none}
   .badge span{display:none}
   .badge img{height:26px}
   .cap{bottom:calc(64px + env(safe-area-inset-bottom,0px))}
-  .count{bottom:auto;top:calc(76px + env(safe-area-inset-top,0px))}
+  .cap.r{left:max(22px,6vw);right:auto;text-align:left}.cap.r .d{margin-left:0}
+  .count{display:none}
+  .map{width:64px;height:64px;top:calc(70px + env(safe-area-inset-top,0px))}
   .pk article+article{padding-left:0;border-left:0}
 }
 </style>
@@ -129,7 +138,7 @@ body.flat .after{padding-top:8rem;background:none}
   <p class="d">A retro wordmark built around a cassette-and-headphones mark, made to carry across merch from a bold chest print to a quiet corner mark.</p>
   <a class="more" href="https://nostalgia.sanad-strategies.com/" target="_blank" rel="noopener">Read more</a>
 </div>
-<div class="ov cap" data-k="4">
+<div class="ov cap r" data-k="4">
   <p class="k">سند · Support</p>
   <h2>The pillar<br>comes first</h2>
   <p class="d">Sanad means support: the pillar a structure leans on before anything else gets built. A brand identity should be the same thing.</p>
@@ -146,11 +155,20 @@ body.flat .after{padding-top:8rem;background:none}
   <p class="d">A one-page showcase for a cupcake and cakesicle brand, opening on a baker film that plays as you scroll.</p>
   <a class="more" href="https://sweet-batter.sanad-strategies.com/" target="_blank" rel="noopener">Read more</a>
 </div>
-<div class="ov end" data-k="7">
+<div class="ov cap" data-k="7">
+  <p class="k">The fifth frame · Still empty</p>
   <h2>Your brand<br>could stand here</h2>
+  <p class="d">Every work in this hall started as a conversation. Tell us what you sell and who it's for.</p>
   <a class="btn" href="https://wa.me/12024748975?text=Hi%20Sanad%2C%20I%27d%20like%20to%20talk%20about%20my%20brand." target="_blank" rel="noopener">Contact Us</a>
 </div>
 <div class="count" id="count"><b>01</b> / 04</div>
+<svg class="map" id="map" viewBox="0 0 84 84" aria-hidden="true">
+  <circle cx="42" cy="42" r="36" class="m-wall"/>
+  <circle cx="42" cy="42" r="26" class="m-ring"/>
+  <g id="m-niches"></g>
+  <circle cx="42" cy="42" r="2.4" class="m-centre"/>
+  <g id="m-me"><path d="M0,-6 L4,4 L0,2 L-4,4 Z" class="m-me"/></g>
+</svg>
 
 <!-- shown instead of the 3D tour when WebGL is unavailable or motion is reduced -->
 <div class="static">
@@ -275,7 +293,7 @@ body.flat .after{padding-top:8rem;background:none}
   const land=new T.Mesh(new T.CylinderGeometry(11.8,11.8,.25,64,1,false,205*D,30*D),mStone);land.position.y=4.85;scene.add(land);
 
   /* ---------- the works, framed in arched niches ---------- */
-  const WORKS=[['toastella-black.jpg','#000',-60],['nostalgia-wordmark.jpg','#fff',-120],['pulse-logo.png','#000',-240],['sweet-batter-logo.png','#000',-300]];
+  const WORKS=[['toastella-black.jpg','#000',-60],['nostalgia-wordmark.jpg','#fff',-120],['pulse-logo.png','#000',-240],['sweet-batter-logo.png','#000',-300],[null,'#0b0b0d',-330]];
   const arts=[];
   WORKS.forEach(([src,bg,deg])=>{
     const a=deg*D,r=RW-.25,g=new T.Group();g.position.set(Math.sin(a)*r,0,Math.cos(a)*r);g.rotation.y=a+Math.PI;scene.add(g);
@@ -284,21 +302,42 @@ body.flat .after{padding-top:8rem;background:none}
     const lip=new T.Mesh(new T.BoxGeometry(2.6,2.6,.17),new T.MeshStandardMaterial({color:0x0c0c0e,roughness:.6}));lip.position.set(0,2.75,.13);g.add(lip);
     const c=document.createElement('canvas');c.width=c.height=1024;const x=c.getContext('2d');x.fillStyle=bg;x.fillRect(0,0,1024,1024);
     const tex=new T.CanvasTexture(c);tex.encoding=T.sRGBEncoding;tex.anisotropy=R.capabilities.getMaxAnisotropy();
-    const im=new Image();im.onload=()=>{const k=Math.min(920/im.width,920/im.height),w=im.width*k,h=im.height*k;x.drawImage(im,(1024-w)/2,(1024-h)/2,w,h);tex.needsUpdate=true};im.src=src;
+    if(src){const im=new Image();im.onload=()=>{const k=Math.min(920/im.width,920/im.height),w=im.width*k,h=im.height*k;x.drawImage(im,(1024-w)/2,(1024-h)/2,w,h);tex.needsUpdate=true};im.src=src}
+    else{ // the empty fifth frame
+      const draw=()=>{x.fillStyle=bg;x.fillRect(0,0,1024,1024);x.strokeStyle='rgba(201,164,92,.45)';x.lineWidth=3;x.strokeRect(70,70,884,884);
+        x.textAlign='center';x.fillStyle='rgba(201,164,92,.85)';x.font='400 104px Cinzel';x.fillText('YOUR',512,470);x.fillText('BRAND',512,600);tex.needsUpdate=true};
+      (document.fonts?document.fonts.load('400 104px Cinzel'):Promise.resolve()).then(draw,draw);
+    }
     const art=new T.Mesh(new T.PlaneGeometry(2.4,2.4),new T.MeshStandardMaterial({map:tex,roughness:.55,metalness:0,emissive:0xffffff,emissiveMap:tex,emissiveIntensity:.18}));art.position.set(0,2.75,.225);g.add(art);
     const plaque=new T.Mesh(new T.BoxGeometry(.7,.16,.04),mGold);plaque.position.set(0,1,.12);g.add(plaque);
     const sp=new T.SpotLight(0xfff0d6,3.2,14,.36,.55,1.3);sp.position.set(Math.sin(a)*6.5,8,Math.cos(a)*6.5);sp.target=art;scene.add(sp);
-    arts.push({art,sp});
+    arts.push({art,sp,base:sp.intensity,deg});
+    const mk=document.createElementNS('http://www.w3.org/2000/svg','circle');mk.setAttribute('r','3');mk.setAttribute('cx',(42+Math.sin(a)*36).toFixed(1));mk.setAttribute('cy',(42+Math.cos(a)*36).toFixed(1));mk.setAttribute('class','m-n'+(src?'':' empty'));document.getElementById('m-niches').appendChild(mk);
+  });
+
+  /* ---------- centre sculpture: the Sanad mark, layered like cast stone ---------- */
+  const sculpt=new T.Group();scene.add(sculpt);
+  const ped=new T.Mesh(new T.CylinderGeometry(1.25,1.4,1.1,48),mStone);ped.position.y=.55;scene.add(ped);
+  const pedTrim=new T.Mesh(new T.TorusGeometry(1.27,.03,8,64),mGold);pedTrim.rotation.x=Math.PI/2;pedTrim.position.y=1.08;scene.add(pedTrim);
+  const key=new T.SpotLight(0xffe7c0,3,14,.45,.6,1.2);key.position.set(0,3.2,6);key.target=sculpt;scene.add(key);
+  new T.TextureLoader().load('sanad-logo.png',tex=>{
+    tex.encoding=T.sRGBEncoding;tex.anisotropy=R.capabilities.getMaxAnisotropy();
+    const w=3.3,h=w*490/1400,L=18;
+    for(let i=0;i<L;i++){
+      const front=i===L-1;
+      const m=new T.MeshStandardMaterial({map:tex,alphaTest:.5,side:T.DoubleSide,color:front?0xf0d08e:0x9a8458,metalness:.15,roughness:front?.4:.75,emissive:front?0xc9a45c:0x3a2e1a,emissiveMap:tex,emissiveIntensity:front?.55:.35});
+      const pl=new T.Mesh(new T.PlaneGeometry(w,h),m);pl.position.set(0,1.75,-(L-1-i)*.014);sculpt.add(pl);
+    }
   });
 
   /* ---------- floating glass title ---------- */
-  const title=new T.Group();title.position.set(0,3.6,0);scene.add(title);
+  const title=new T.Group();title.position.set(0,4.7,0);scene.add(title);
   function titleTex(color,glow){
     const c=document.createElement('canvas');c.width=2048;c.height=640;const x=c.getContext('2d');
     x.textAlign='center';x.textBaseline='middle';x.fillStyle=color;
     if(glow){x.shadowColor=glow;x.shadowBlur=40}
-    x.font='600 300px Cinzel';x.fillText('SANAD',1024,250);
-    x.font='400 104px Cinzel';x.fillText('S T R A T E G I E S',1024,500);
+    x.font='600 178px Cinzel';x.fillText('BRANDS BUILT',1024,200);
+    x.font='600 178px Cinzel';x.fillText('TO STAND',1024,440);
     const t=new T.CanvasTexture(c);t.encoding=T.sRGBEncoding;return t;
   }
   const TW=6.2,TH=TW*640/2048;
@@ -314,37 +353,58 @@ body.flat .after{padding-top:8rem;background:none}
   /* ---------- camera stops (polar: angle deg, radius, height) ---------- */
   const STOPS=[
     {ca:0,cr:21,ch:2.1, la:0,lr:0,lh:3.3},          // outside the gate
-    {ca:0,cr:7.6,ch:2.3, la:0,lr:0,lh:3.5},         // under the title
+    {ca:0,cr:8.4,ch:2.2, la:0,lr:0,lh:3.1, nl:-.8},         // the sculpture and the floating tagline
     {ca:-60,cr:5.2,ch:2.2, la:-60,lr:RW,lh:2.75},   // Toastella
     {ca:-120,cr:5.2,ch:2.2, la:-120,lr:RW,lh:2.75}, // Nostalgia
-    {ca:-180,cr:7.6,ch:4.9, la:-180,lr:0,lh:3.1},   // up the stairs, looking back over the rotunda
+    {ca:-180,cr:9.4,ch:5.6, la:-180,lr:0,lh:3.3, nl:-.9},   // up the stairs, looking back over the rotunda
     {ca:-240,cr:5.2,ch:2.2, la:-240,lr:RW,lh:2.75}, // Pulse
     {ca:-300,cr:5.2,ch:2.2, la:-300,lr:RW,lh:2.75}, // Sweet Batter
-    {ca:-360,cr:9.2,ch:1.7, la:-360,lr:0,lh:2.2}    // back to the title, looking up into the light
+    {ca:-330,cr:5.2,ch:2.2, la:-330,lr:RW,lh:2.75}  // the empty fifth frame
   ];
+  let narrow=innerWidth/innerHeight<.8;
   const N=STOPS.length-1,ss=v=>v<=0?0:v>=1?1:v*v*(3-2*v);
   function stopAt(f){
     const i=Math.min(N-1,Math.floor(f)),t=f-i,u=ss((t-.2)/.6),A=STOPS[i],B=STOPS[i+1],L=(k)=>A[k]+(B[k]-A[k])*u;
-    const ca=L('ca')*D,la=L('la')*D,cr=L('cr'),lr=L('lr');
-    return {p:new T.Vector3(Math.sin(ca)*cr,L('ch'),Math.cos(ca)*cr),l:new T.Vector3(Math.sin(la)*lr,L('lh'),Math.cos(la)*lr)};
+    const ca=L('ca')*D,la=L('la')*D,cr=L('cr'),lr=L('lr'),art=Math.min(1,lr/RW),dy=narrow?art:0,nl=narrow?(A.nl||0)+((B.nl||0)-(A.nl||0))*u:0;
+    return {p:new T.Vector3(Math.sin(ca)*cr,L('ch')+.3*dy,Math.cos(ca)*cr),l:new T.Vector3(Math.sin(la)*lr,L('lh')-.9*dy+nl,Math.cos(la)*lr)};
   }
   const tour=document.getElementById('tour');
   const prog=()=>{const r=tour.getBoundingClientRect();return Math.max(0,Math.min(1,-r.top/(r.height-innerHeight)))};
   const pos=new T.Vector3(),look=new T.Vector3();{const s=stopAt(prog()*N);pos.copy(s.p);look.copy(s.l)}
 
-  function size(){const w=innerWidth,h=innerHeight;R.setSize(w,h,false);cam.aspect=w/h;cam.fov=w/h<.8?68:52;cam.updateProjectionMatrix()}
+  function size(){const w=innerWidth,h=innerHeight;narrow=w/h<.8;R.setSize(w,h,false);cam.aspect=w/h;cam.fov=w/h<.8?68:52;cam.updateProjectionMatrix()}
   addEventListener('resize',size);size();
 
   const ovs=[...document.querySelectorAll('.ov')],count=document.getElementById('count'),cb=count.querySelector('b');
-  const workStops=[2,3,5,6];
+  const workStops=[2,3,5,6],artStops=[2,3,5,6,7];
+  const born=performance.now(),ramp=(t,d)=>Math.max(0,Math.min(1,(t-d)/1.2));
+  const hemi=scene.children.find(o=>o.isHemisphereLight),oBase=oculus.intensity,wBase=warm.intensity;
+  const fine=matchMedia('(pointer:fine)').matches;let tx=0,ty=0,lx=0,ly=0;
+  if(fine)addEventListener('pointermove',e=>{tx=e.clientX/innerWidth*2-1;ty=e.clientY/innerHeight*2-1},{passive:true});
+  const meG=document.getElementById('m-me'),mapEl=document.getElementById('map'),dots=[...document.querySelectorAll('#m-niches circle')];
+  const fwd=new T.Vector3(),side=new T.Vector3(),UP=new T.Vector3(0,1,0),aim=new T.Vector3();
   let last=performance.now();
   function loop(now){
     const dt=Math.min(.05,(now-last)/1000);last=now;
     const p=prog(),f=p*N,s=stopAt(f),k=1-Math.exp(-dt*4);
-    pos.lerp(s.p,k);look.lerp(s.l,k);cam.position.copy(pos);cam.lookAt(look);
+    pos.lerp(s.p,k);look.lerp(s.l,k);cam.position.copy(pos);
+    // a slight lean toward the cursor on desktop (about 1-2 degrees), never a roll
+    lx+=(tx-lx)*k*.6;ly+=(ty-ly)*k*.6;fwd.subVectors(look,pos).normalize();side.crossVectors(fwd,UP).normalize();
+    aim.copy(look).addScaledVector(side,lx*.32).addScaledVector(UP,-ly*.18);cam.lookAt(aim);
+    // lights come on one after another when the page opens
+    const ts=(now-born)/1000;hemi.intensity=.28*ramp(ts,0);oculus.intensity=oBase*ramp(ts,.25);warm.intensity=wBase*ramp(ts,.6);
+    arts.forEach((o,i)=>{const pr=Math.max(0,1-Math.abs(f-artStops[i])*1.3);
+      o.sp.intensity=o.base*(.45+.8*pr)*ramp(ts,.9+i*.3);o.art.material.emissiveIntensity=.1+.28*pr;
+      dots[i]&&dots[i].classList.toggle('on',pr>.55)});
+    title.children.forEach(c=>{c.material.opacity=(c.userData.o??(c.userData.o=c.material.opacity))*ramp(ts,1.6)});
+    // the sculpture turns to face the visitor like the title
+    sculpt.rotation.y=Math.atan2(pos.x,pos.z);
+    // mini map
+    meG.setAttribute('transform','translate('+(42+pos.x/RW*36).toFixed(1)+','+(42+pos.z/RW*36).toFixed(1)+') rotate('+(Math.atan2(fwd.x,-fwd.z)/D).toFixed(1)+')');
+    mapEl.style.opacity=Math.max(0,Math.min(1,(f-.5)*2)).toFixed(3);
     // title always turns to face the viewer (yaw only) and breathes slowly
     title.rotation.y=Math.atan2(pos.x-title.position.x,pos.z-title.position.z);
-    title.position.y=3.6+Math.sin(now*.0006)*.06;
+    title.position.y=4.7+Math.sin(now*.0006)*.06;
     const d=dust.geometry.attributes.position;for(let i=0;i<DN;i++){let y=d.array[i*3+1]+dt*.12;if(y>12)y=0;d.array[i*3+1]=y}d.needsUpdate=true;
     // captions
     ovs.forEach(o=>{const a=Math.max(0,Math.min(1,1-(Math.abs(f-(+o.dataset.k))-.1)*3.4));o.style.opacity=a.toFixed(3);o.classList.toggle('on',a>.6);
