@@ -420,35 +420,46 @@ body.flat .after{padding-top:8rem;background:none}
   }
   requestAnimationFrame(loop);
 
-  /* snap: when the visitor stops scrolling inside the tour, glide to the nearest stop
-     so each work settles framed and centred. Never fires while a finger is down. */
-  let snapT=0,touching=false,snapping=false;
+  /* snap: once scrolling has fully stopped inside the tour, settle on a stop.
+     It follows the direction of travel: any real move goes on to the next stop that way,
+     and only a tiny nudge returns to where you were. Never acts while a finger is down
+     or while the page is still coasting. */
+  let snapT=0,touching=false,snapping=false,lastY=scrollY,dir=0;
+  const fNow=()=>{const r=tour.getBoundingClientRect();return Math.max(0,Math.min(1,-r.top/(r.height-innerHeight)))*N};
+  let home=Math.round(fNow());
   function snapTo(){
     const r=tour.getBoundingClientRect(),span=r.height-innerHeight;
     if(touching||snapping||r.top>0||r.bottom<innerHeight+2)return;
-    const f=Math.max(0,Math.min(1,-r.top/span))*N,k=Math.round(f);
-    if(Math.abs(f-k)<.015)return;
-    const y=scrollY+r.top+span*k/N;
-    glide(y);
+    const f=fNow();
+    let k;
+    if(Math.abs(f-home)<.1)k=home;                      // barely moved: stay
+    else k=dir>0?Math.ceil(f-.02):Math.floor(f+.02);     // moved: continue the way you were going
+    k=Math.max(0,Math.min(N,k));
+    if(Math.abs(f-k)<.015){home=k;return}
+    glide(scrollY+r.top+span*k/N,k);
   }
   // our own short eased glide (browsers' smooth scroll is unreliable here); any wheel, touch or key cancels it
   let gid=0;
-  function glide(y){
+  function glide(y,k){
     const y0=scrollY,d=y-y0,t0=performance.now(),dur=Math.min(700,320+Math.abs(d)*.6),id=++gid;snapping=true;
     (function step(now){
       if(id!==gid)return;
-      const t=Math.min(1,(now-t0)/dur),e=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+      const t=Math.min(1,Math.max(0,(now-t0)/dur)),e=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
       scrollTo(0,y0+d*e);
-      if(t<1)requestAnimationFrame(step);else setTimeout(()=>{if(id===gid)snapping=false},80);
+      if(t<1)requestAnimationFrame(step);else{home=k;lastY=scrollY;setTimeout(()=>{if(id===gid)snapping=false},120)}
     })(t0);
   }
-  const cancel=()=>{if(snapping){gid++;snapping=false}};
+  const cancel=()=>{if(snapping){gid++;snapping=false;home=Math.round(fNow())}};
   addEventListener('wheel',cancel,{passive:true});addEventListener('keydown',cancel);
-  const later=()=>{clearTimeout(snapT);snapT=setTimeout(snapTo,'onscrollend' in window?60:170)};
-  addEventListener('scroll',()=>{if(!snapping)later()},{passive:true});
-  if('onscrollend' in window)addEventListener('scrollend',()=>{if(!snapping)later()});
+  const hasEnd='onscrollend' in window;
+  const later=()=>{clearTimeout(snapT);snapT=setTimeout(snapTo,hasEnd?140:260)};
+  addEventListener('scroll',()=>{
+    const y=scrollY;if(Math.abs(y-lastY)>1)dir=y>lastY?1:-1;lastY=y;
+    if(!snapping){clearTimeout(snapT);if(!hasEnd)later()}
+  },{passive:true});
+  if(hasEnd)addEventListener('scrollend',()=>{if(!snapping&&!touching)later()});
   addEventListener('touchstart',()=>{touching=true;cancel();clearTimeout(snapT)},{passive:true});
-  addEventListener('touchend',()=>{touching=false;later()},{passive:true});
+  addEventListener('touchend',()=>{touching=false;if(!hasEnd)later()},{passive:true});
 })();
 </script>
 </body>
