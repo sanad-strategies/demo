@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sanad Demos</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#060608">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* Demo index: a quiet list of work-in-progress pages, in the gallery's dark serif style */
+:root{--bg:#060608;--ink:#ece7dd;--mut:#9d998f;--line:rgba(236,231,221,.14);--gold:#c9a45c;
+  --serif:'Cinzel',Georgia,serif;--sans:'Jost',system-ui,sans-serif;color-scheme:dark}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font:300 1rem/1.6 var(--sans);min-height:100vh;
+  padding:max(9vh,64px) max(22px,env(safe-area-inset-right,0px)) 4rem max(22px,env(safe-area-inset-left,0px))}
+main{max-width:760px;margin:0 auto}
+img{height:30px;width:auto;display:block;margin-bottom:3rem}
+.k{font:400 .7rem var(--sans);letter-spacing:.24em;text-transform:uppercase;color:var(--mut);margin-bottom:.8rem}
+h1{font:400 clamp(2rem,6vw,3.2rem)/1.1 var(--serif);text-transform:uppercase;letter-spacing:.04em;margin-bottom:1rem;text-wrap:balance}
+.lead{color:var(--mut);max-width:52ch;margin-bottom:3rem}
+ul{list-style:none;border-top:1px solid var(--line)}
+li a{display:grid;grid-template-columns:1fr auto;gap:.3rem 1rem;align-items:baseline;padding:1.6rem 0;border-bottom:1px solid var(--line);transition:padding .3s}
+li a:hover{padding-left:.6rem}
+li a:focus-visible{outline:1px solid var(--gold);outline-offset:4px}
+li b{font:400 1.35rem var(--serif);text-transform:uppercase;letter-spacing:.05em}
+li span{font:400 .7rem var(--sans);letter-spacing:.2em;text-transform:uppercase;color:var(--gold)}
+li p{grid-column:1/-1;color:var(--mut);font-size:.95rem;max-width:60ch}
+footer{margin-top:3rem;font:400 .7rem var(--sans);letter-spacing:.18em;text-transform:uppercase;color:var(--mut)}
+footer a{border-bottom:1px solid currentColor}
+@media (prefers-reduced-motion:reduce){li a{transition:none}}
+</style>
+</head>
+<body>
+<main>
+  <img src="sanad-strategies.png" alt="Sanad Strategies" width="700" height="195">
+  <p class="k">Work in progress · Not the live website</p>
+  <h1>Sanad demos</h1>
+  <p class="lead">Preview pages for the next version of sanad-strategies.com. Open one, try it on your phone and computer, and send your notes.</p>
+  <ul>
+    <li><a href="gallery.html"><b>Virtual gallery</b><span>Newest</span>
+      <p>The whole site as a dark marble rotunda you walk through by scrolling, with the work framed on the walls.</p></a></li>
+    <li><a href="homepage.html"><b>Homepage redesign</b><span>Earlier</span>
+      <p>Teal, sand and orange colours, glass panels, the typed-code opening, Contact Us buttons and the 3D pillar gallery.</p></a></li>
+  </ul>
+  <footer>The live site stays at <a href="https://sanad-strategies.com/">sanad-strategies.com</a></footer>
+</main>
+</body>
+</html>

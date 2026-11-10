@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sanad Strategies | A Virtual Gallery</title>
+<meta name="description" content="Walk through the Sanad Strategies gallery: brand identity, product photography and websites by a brand studio in Egypt.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#060608">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#060608;--ink:#ece7dd;--mut:#9d998f;--faint:rgba(236,231,221,.14);--gold:#c9a45c;
+  --serif:'Cinzel',Georgia,serif;--sans:'Jost',system-ui,sans-serif;color-scheme:dark
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--bg)}
+body{background:var(--bg);color:var(--ink);font:300 1rem/1.6 var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:1px solid var(--gold);outline-offset:4px}
+
+#cv{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:0}
+.veil{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.55) 100%)}
+
+/* top bar */
+.top{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:calc(18px + env(safe-area-inset-top,0px)) max(22px,4vw) 18px}
+.badge{display:flex;align-items:center;gap:.8rem;font:400 .68rem var(--sans);letter-spacing:.22em;text-transform:uppercase;color:var(--mut)}
+.badge img{height:30px;width:auto;display:block}
+.badge span{padding-left:.8rem;border-left:1px solid var(--faint)}
+.menu{display:flex;align-items:center;gap:1.8rem;font:400 .72rem var(--sans);letter-spacing:.2em;text-transform:uppercase}
+.menu a{color:var(--mut);transition:color .3s}
+.menu a:hover{color:var(--ink)}
+.menu a.cta{color:var(--ink);border:1px solid rgba(236,231,221,.35);padding:.6rem 1.1rem;border-radius:2px}
+.menu a.cta:hover{border-color:var(--ink)}
+
+/* scroll driver */
+#tour{position:relative;z-index:2;height:1000vh}
+
+/* overlays */
+.ov{position:fixed;z-index:10;opacity:0;pointer-events:none;will-change:opacity,transform}
+.ov.on{pointer-events:auto}
+.cap{left:max(22px,6vw);bottom:max(9vh,90px);max-width:min(520px,calc(100% - 44px))}
+.cap .k{font:400 .7rem var(--sans);letter-spacing:.24em;text-transform:uppercase;color:var(--mut);margin-bottom:.9rem}
+.cap h2{font:400 clamp(2rem,4.6vw,3.6rem)/1.08 var(--serif);text-transform:uppercase;letter-spacing:.04em}
+.cap .d{font:300 .95rem/1.65 var(--sans);color:var(--mut);margin:.9rem 0 1.2rem;max-width:44ch}
+.cap .more{font:500 .72rem var(--sans);letter-spacing:.24em;text-transform:uppercase;border-bottom:1px solid currentColor;padding-bottom:.25rem}
+.cap .more:hover{color:var(--gold)}
+.intro{left:50%;top:max(15vh,100px);transform:translateX(-50%);text-align:center}
+.intro .k{font:400 .7rem var(--sans);letter-spacing:.3em;text-transform:uppercase;color:var(--mut)}
+.intro .line{width:1px;height:46px;margin:1rem auto 0;background:linear-gradient(var(--ink),transparent);animation:drip 2.4s ease-in-out infinite}
+@keyframes drip{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+.end{left:50%;bottom:max(8vh,80px);transform:translateX(-50%);text-align:center;width:min(720px,calc(100% - 44px))}
+.end h2{font:400 clamp(1.7rem,4vw,3rem)/1.1 var(--serif);text-transform:uppercase;letter-spacing:.04em;margin-bottom:1.8rem}
+.btn{display:inline-block;font:500 .74rem var(--sans);letter-spacing:.24em;text-transform:uppercase;padding:1rem 1.6rem;border:1px solid var(--ink);color:var(--ink);transition:background .3s,color .3s}
+.btn:hover{background:var(--ink);color:#0b0b0d}
+.count{position:fixed;z-index:10;right:max(22px,4vw);bottom:max(9vh,90px);font:400 .72rem var(--sans);letter-spacing:.2em;color:var(--mut);opacity:0}
+.count b{font-weight:400;color:var(--ink)}
+
+/* after the tour */
+.after{position:relative;z-index:3;background:linear-gradient(to bottom,rgba(6,6,8,0),rgba(6,6,8,.92) 30vh,var(--bg) 60vh);padding:40vh max(22px,6vw) 6rem}
+.after section{max-width:1080px;margin:0 auto 9rem}
+.after .k{font:400 .7rem var(--sans);letter-spacing:.24em;text-transform:uppercase;color:var(--mut);margin-bottom:1rem}
+.after h2{font:400 clamp(2rem,4.4vw,3.4rem)/1.1 var(--serif);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2.6rem}
+.pk{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));border-top:1px solid var(--faint)}
+.pk article{padding:2rem 2rem 2.2rem 0;border-bottom:1px solid var(--faint)}
+.pk article+article{padding-left:2rem;border-left:1px solid var(--faint)}
+.pk h3{font:400 1.3rem var(--serif);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.4rem}
+.pk .price{font:400 .8rem var(--sans);letter-spacing:.18em;color:var(--gold);margin-bottom:1rem}
+.pk p{color:var(--mut);font-size:.95rem}
+.contact{text-align:center}
+.contact p{color:var(--mut);max-width:46ch;margin:0 auto 2rem}
+footer{max-width:1080px;margin:0 auto;padding-top:2rem;border-top:1px solid var(--faint);display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem;font:400 .7rem var(--sans);letter-spacing:.18em;text-transform:uppercase;color:var(--mut)}
+
+/* fallback without WebGL or with reduced motion */
+.static{display:none;position:relative;z-index:3;padding:22vh max(22px,6vw) 0;max-width:1180px;margin:0 auto}
+.static .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:2.4rem}
+.static img{width:100%;aspect-ratio:1;object-fit:contain;background:#000;border:6px solid #2a241a;outline:1px solid var(--gold)}
+.static h3{font:400 1.2rem var(--serif);text-transform:uppercase;margin:1rem 0 .3rem}
+.static p{color:var(--mut);font-size:.9rem;margin-bottom:.6rem}
+body.flat #cv,body.flat .ov,body.flat .count{display:none}
+body.flat #tour{display:none}
+body.flat .static{display:block}
+body.flat .after{padding-top:8rem;background:none}
+
+@media (max-width:760px){
+  .menu a:not(.cta){display:none}
+  .badge span{display:none}
+  .badge img{height:26px}
+  .cap{bottom:calc(64px + env(safe-area-inset-bottom,0px))}
+  .count{bottom:auto;top:calc(76px + env(safe-area-inset-top,0px))}
+  .pk article+article{padding-left:0;border-left:0}
+}
+</style>
+</head>
+<body>
+<canvas id="cv" aria-hidden="true"></canvas>
+<div class="veil"></div>
+
+<header class="top">
+  <a class="badge" href="#"><img src="sanad-strategies.png" alt="Sanad Strategies" width="700" height="195"><span>Brand studio · Egypt</span></a>
+  <nav class="menu" aria-label="Main">
+    <a href="#packages">Packages</a>
+    <a href="#contact">Contact</a>
+    <a class="cta" href="https://wa.me/12024748975?text=Hi%20Sanad%2C%20I%27d%20like%20to%20talk%20about%20my%20brand." target="_blank" rel="noopener">Contact Us</a>
+  </nav>
+</header>
+
+<div id="tour" aria-hidden="true"></div>
+
+<!-- captions: data-k is the camera stop they belong to -->
+<div class="ov intro" data-k="0"><p class="k">A virtual gallery · Scroll to enter</p><div class="line"></div></div>
+<div class="ov cap" data-k="1">
+  <p class="k">The Sanad gallery</p>
+  <h2>Sanad<br>Strategies</h2>
+  <p class="d">Brand identity, product photography and websites for labels that want a foundation, not a favor.</p>
+</div>
+<div class="ov cap" data-k="2">
+  <p class="k">Food &amp; snack brand · Est. 2024</p>
+  <h2>Toastella</h2>
+  <p class="d">A full identity for a snack brand: logo, mascot, colour system and guidelines, playful without looking childish.</p>
+  <a class="more" href="https://toastella.sanad-strategies.com/" target="_blank" rel="noopener">Read more</a>
+</div>
+<div class="ov cap" data-k="3">
+  <p class="k">Apparel brand</p>
+  <h2>Nostalgia</h2>
+  <p class="d">A retro wordmark built around a cassette-and-headphones mark, made to carry across merch from a bold chest print to a quiet corner mark.</p>
+  <a class="more" href="https://nostalgia.sanad-strategies.com/" target="_blank" rel="noopener">Read more</a>
+</div>
+<div class="ov cap" data-k="4">
+  <p class="k">سند · Support</p>
+  <h2>The pillar<br>comes first</h2>
+  <p class="d">Sanad means support: the pillar a structure leans on before anything else gets built. A brand identity should be the same thing.</p>
+</div>
+<div class="ov cap" data-k="5">
+  <p class="k">Jewelry brand</p>
+  <h2>Pulse</h2>
+  <p class="d">A gothic, cosmic identity for a nighttime buyer: deep space colour, moody product photography and a cash-on-delivery website.</p>
+  <a class="more" href="https://pulse.sanad-strategies.com/" target="_blank" rel="noopener">Read more</a>
+</div>
+<div class="ov cap" data-k="6">
+  <p class="k">Bakery · Concept website</p>
+  <h2>Sweet Batter</h2>
+  <p class="d">A one-page showcase for a cupcake and cakesicle brand, opening on a baker film that plays as you scroll.</p>
+  <a class="more" href="https://sweet-batter.sanad-strategies.com/" target="_blank" rel="noopener">Read more</a>
+</div>
+<div class="ov end" data-k="7">
+  <h2>Your brand<br>could stand here</h2>
+  <a class="btn" href="https://wa.me/12024748975?text=Hi%20Sanad%2C%20I%27d%20like%20to%20talk%20about%20my%20brand." target="_blank" rel="noopener">Contact Us</a>
+</div>
+<div class="count" id="count"><b>01</b> / 04</div>
+
+<!-- shown instead of the 3D tour when WebGL is unavailable or motion is reduced -->
+<div class="static">
+  <p class="k" style="font:400 .7rem var(--sans);letter-spacing:.24em;text-transform:uppercase;color:var(--mut);margin-bottom:1rem">The Sanad gallery</p>
+  <h2 style="font:400 clamp(2rem,4.4vw,3.4rem)/1.1 var(--serif);text-transform:uppercase;margin-bottom:2.6rem">Selected work</h2>
+  <div class="grid">
+    <div><img src="toastella-black.jpg" alt="Toastella logo"><h3>Toastella</h3><p>Food &amp; snack brand identity</p><a class="more" href="https://toastella.sanad-strategies.com/">Read more</a></div>
+    <div><img src="nostalgia-wordmark.jpg" alt="Nostalgia wordmark"><h3>Nostalgia</h3><p>Apparel wordmark and merch</p><a class="more" href="https://nostalgia.sanad-strategies.com/">Read more</a></div>
+    <div><img src="pulse-logo.png" alt="Pulse logo"><h3>Pulse</h3><p>Jewelry identity, photography, website</p><a class="more" href="https://pulse.sanad-strategies.com/">Read more</a></div>
+    <div><img src="sweet-batter-logo.png" alt="Sweet Batter logo"><h3>Sweet Batter</h3><p>Bakery concept website</p><a class="more" href="https://sweet-batter.sanad-strategies.com/">Read more</a></div>
+  </div>
+</div>
+
+<div class="after">
+  <section id="packages">
+    <p class="k">Ways to start</p>
+    <h2>Packages</h2>
+    <div class="pk">
+      <article><h3>First Time Offer</h3><p class="price">1,500 – 2,500 EGP</p><p>One deliverable done properly: a logo and small colour system, or a styled product photo set. One round of revisions.</p></article>
+      <article><h3>Glow Up</h3><p class="price">4,000 – 6,000 EGP</p><p>Two pieces working together: identity with product photography, or identity with a website. Two rounds of revisions.</p></article>
+      <article><h3>From A to Success</h3><p class="price">6,000 – 10,000 EGP</p><p>Identity, photography and a website built as one system from day one. Full revision support until it's right.</p></article>
+    </div>
+  </section>
+  <section id="contact" class="contact">
+    <p class="k">Let's build something</p>
+    <h2>Contact us</h2>
+    <p>Tell us about your brand on WhatsApp: what you sell, who buys it, and where you want it to go.</p>
+    <a class="btn" href="https://wa.me/12024748975?text=Hi%20Sanad%2C%20I%27d%20like%20to%20talk%20about%20my%20brand." target="_blank" rel="noopener">Contact Us</a>
+  </section>
+  <footer><span>© 2026 Sanad Strategies</span><span>Based in Egypt</span></footer>
+</div>
+
+<script src="three.min.js"></script>
+<script src="three-reflector.js"></script>
+<script>
+/* Sanad virtual gallery: a dark neoclassical rotunda walked through by scrolling.
+   The camera only moves with the scroll position and never rolls. */
+(function(){
+  const body=document.body;
+  const reduced=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  let ok=!!window.THREE&&!reduced;
+  if(ok){try{const t=document.createElement('canvas');ok=!!(t.getContext('webgl')||t.getContext('experimental-webgl'))}catch(e){ok=false}}
+  if(!ok){body.classList.add('flat');return}
+
+  const T=THREE,D=Math.PI/180,touch=matchMedia('(pointer:coarse)').matches;
+  const cv=document.getElementById('cv');
+  const R=new T.WebGLRenderer({canvas:cv,antialias:true,powerPreference:'high-performance'});
+  R.setPixelRatio(Math.min(devicePixelRatio||1,touch?1.5:1.75));
+  R.outputEncoding=T.sRGBEncoding;R.toneMapping=T.ACESFilmicToneMapping;R.toneMappingExposure=1.15;
+  const scene=new T.Scene();scene.background=new T.Color(0x050507);scene.fog=new T.FogExp2(0x050507,.032);
+  const cam=new T.PerspectiveCamera(52,1,.1,200);
+
+  /* ---------- procedural dark marble ---------- */
+  function marble(base,vein,veins,rep){
+    const c=document.createElement('canvas');c.width=c.height=1024;const x=c.getContext('2d');
+    x.fillStyle=base;x.fillRect(0,0,1024,1024);
+    for(let i=0;i<9000;i++){x.fillStyle='rgba(255,255,255,'+(Math.random()*.018)+')';x.fillRect(Math.random()*1024,Math.random()*1024,2,2)}
+    for(let i=0;i<veins;i++){
+      x.strokeStyle=vein.replace('A',(.04+Math.random()*.16).toFixed(3));x.lineWidth=.4+Math.random()*2.4;
+      x.beginPath();let px=Math.random()*1024,py=Math.random()*1024;x.moveTo(px,py);
+      for(let k=0;k<6;k++){const nx=px+(Math.random()-.4)*360,ny=py+(Math.random()-.5)*220;x.quadraticCurveTo((px+nx)/2+(Math.random()-.5)*120,(py+ny)/2+(Math.random()-.5)*120,nx,ny);px=nx;py=ny}
+      x.stroke();
+    }
+    const t=new T.CanvasTexture(c);t.wrapS=t.wrapT=T.RepeatWrapping;t.repeat.set(rep,rep);t.encoding=T.sRGBEncoding;t.anisotropy=R.capabilities.getMaxAnisotropy();return t;
+  }
+  const mDark=new T.MeshStandardMaterial({map:marble('#141418','rgba(205,205,215,A)',70,1),roughness:.42,metalness:.08});
+  const mStone=new T.MeshStandardMaterial({map:marble('#2a2a30','rgba(225,225,232,A)',60,1),roughness:.5,metalness:.05});
+  const mWall=new T.MeshStandardMaterial({map:marble('#0f0f12','rgba(190,190,200,A)',50,3),roughness:.6,metalness:.05,side:T.BackSide});
+  const mGold=new T.MeshStandardMaterial({color:0xb48a48,roughness:.32,metalness:.85});
+
+  /* ---------- light ---------- */
+  scene.add(new T.HemisphereLight(0x8a92a8,0x050505,.28));
+  const oculus=new T.SpotLight(0xfff0d8,4.2,40,.5,.75,1.1);oculus.position.set(0,17,0);oculus.target.position.set(0,0,0);scene.add(oculus,oculus.target);
+  const warm=new T.PointLight(0xffd9a0,.6,22,2);warm.position.set(0,3.5,0);scene.add(warm);
+
+  /* ---------- floor: mirror on desktop, polished marble on phones ---------- */
+  if(!touch&&T.Reflector){
+    const mirror=new T.Reflector(new T.CircleGeometry(40,72),{textureWidth:1024,textureHeight:1024,color:0x5a5a62});
+    mirror.rotation.x=-Math.PI/2;scene.add(mirror);
+  }
+  const fl=new T.Mesh(new T.CircleGeometry(40,72),new T.MeshStandardMaterial({map:marble('#18181c','rgba(210,210,220,A)',80,6),roughness:.28,metalness:.1,transparent:!touch,opacity:touch?1:.78}));
+  fl.rotation.x=-Math.PI/2;fl.position.y=.003;scene.add(fl);
+  [4.2,8.9].forEach(r=>{const g=new T.Mesh(new T.RingGeometry(r,r+.06,128),new T.MeshBasicMaterial({color:0x8a6b36,transparent:true,opacity:.55}));g.rotation.x=-Math.PI/2;g.position.y=.006;scene.add(g)});
+
+  /* ---------- rotunda ---------- */
+  const RC=8.6,RW=12;
+  const shaft=new T.CylinderGeometry(.36,.42,7,28),blk=new T.BoxGeometry(1.15,.38,1.15),ring=new T.CylinderGeometry(.56,.6,.22,28);
+  for(let i=0;i<12;i++){
+    const a=(15+i*30)*D,x=Math.sin(a)*RC,z=Math.cos(a)*RC;
+    const s=new T.Mesh(shaft,mStone);s.position.set(x,3.9,z);scene.add(s);
+    const b=new T.Mesh(blk,mStone);b.position.set(x,.19,z);scene.add(b);
+    const r=new T.Mesh(ring,mStone);r.position.set(x,.49,z);scene.add(r);
+    const c=new T.Mesh(blk,mStone);c.position.set(x,7.55,z);scene.add(c);
+  }
+  const ent=new T.Mesh(new T.CylinderGeometry(9.3,9.3,1.1,96,1,true),mStone);ent.material=mWall.clone();ent.material.side=T.DoubleSide;ent.position.y=8.25;scene.add(ent);
+  const wall=new T.Mesh(new T.CylinderGeometry(RW,RW,8.8,128,1,true,12*D,336*D),mWall);wall.position.y=4.4;scene.add(wall);
+  const dome=new T.Mesh(new T.SphereGeometry(RW,64,24,0,Math.PI*2,.11,Math.PI/2-.11),mWall);dome.scale.y=.55;dome.position.y=8.8;scene.add(dome);
+
+  // beam of light from the oculus, with slow dust
+  const gc=document.createElement('canvas');gc.width=4;gc.height=256;const gx=gc.getContext('2d');const gg=gx.createLinearGradient(0,0,0,256);gg.addColorStop(0,'#fff');gg.addColorStop(1,'#000');gx.fillStyle=gg;gx.fillRect(0,0,4,256);
+  const beam=new T.Mesh(new T.CylinderGeometry(1.3,3.8,14.6,48,1,true),new T.MeshBasicMaterial({color:0xfff1d8,alphaMap:new T.CanvasTexture(gc),transparent:true,opacity:.085,side:T.DoubleSide,depthWrite:false,blending:T.AdditiveBlending,fog:false}));
+  beam.position.y=7.3;scene.add(beam);
+  const DN=touch?160:320,dpos=new Float32Array(DN*3);
+  for(let i=0;i<DN;i++){const r=Math.random()*3.2,a=Math.random()*Math.PI*2;dpos[i*3]=Math.sin(a)*r;dpos[i*3+1]=Math.random()*12;dpos[i*3+2]=Math.cos(a)*r}
+  const dg=new T.BufferGeometry();dg.setAttribute('position',new T.BufferAttribute(dpos,3));
+  const dust=new T.Points(dg,new T.PointsMaterial({color:0xfff3dc,size:.035,transparent:true,opacity:.7,depthWrite:false,blending:T.AdditiveBlending}));scene.add(dust);
+
+  // arch shapes (entrance and painting niches)
+  function arch(w,h,t,innerW,innerH){
+    const s=new T.Shape();s.moveTo(-w/2,0);s.lineTo(-w/2,h);s.absarc(0,h,w/2,Math.PI,0,true);s.lineTo(w/2,0);s.lineTo(-w/2,0);
+    if(innerW){const hole=new T.Path();hole.moveTo(-innerW/2,0);hole.lineTo(-innerW/2,innerH);hole.absarc(0,innerH,innerW/2,Math.PI,0,true);hole.lineTo(innerW/2,0);hole.lineTo(-innerW/2,0);s.holes.push(hole)}
+    return new T.ExtrudeGeometry(s,{depth:t,bevelEnabled:false,curveSegments:40});
+  }
+  const gate=new T.Mesh(arch(6.2,5.2,1.2,3.8,4.6),mStone);gate.position.set(0,0,RW-.4);scene.add(gate);
+
+  // curved staircase at the back of the rotunda
+  for(let i=0;i<30;i++){
+    const a=(152+i*2.1)*D,y=.16+i*.16,st=new T.Mesh(new T.BoxGeometry(2.1,.16,.48),mStone);
+    st.position.set(Math.sin(a)*10.6,y,Math.cos(a)*10.6);st.rotation.y=a;scene.add(st);
+    if(i%3===0){const p=new T.Mesh(new T.CylinderGeometry(.04,.04,1,8),mGold);p.position.set(Math.sin(a)*9.6,y+.55,Math.cos(a)*9.6);scene.add(p)}
+  }
+  const land=new T.Mesh(new T.CylinderGeometry(11.8,11.8,.25,64,1,false,205*D,30*D),mStone);land.position.y=4.85;scene.add(land);
+
+  /* ---------- the works, framed in arched niches ---------- */
+  const WORKS=[['toastella-black.jpg','#000',-60],['nostalgia-wordmark.jpg','#fff',-120],['pulse-logo.png','#000',-240],['sweet-batter-logo.png','#000',-300]];
+  const arts=[];
+  WORKS.forEach(([src,bg,deg])=>{
+    const a=deg*D,r=RW-.25,g=new T.Group();g.position.set(Math.sin(a)*r,0,Math.cos(a)*r);g.rotation.y=a+Math.PI;scene.add(g);
+    const niche=new T.Mesh(arch(4.4,4.4,.35,3.6,4.4),mStone);niche.position.z=-.05;g.add(niche);
+    const frame=new T.Mesh(new T.BoxGeometry(2.9,2.9,.16),mGold);frame.position.set(0,2.75,.12);g.add(frame);
+    const lip=new T.Mesh(new T.BoxGeometry(2.6,2.6,.17),new T.MeshStandardMaterial({color:0x0c0c0e,roughness:.6}));lip.position.set(0,2.75,.13);g.add(lip);
+    const c=document.createElement('canvas');c.width=c.height=1024;const x=c.getContext('2d');x.fillStyle=bg;x.fillRect(0,0,1024,1024);
+    const tex=new T.CanvasTexture(c);tex.encoding=T.sRGBEncoding;tex.anisotropy=R.capabilities.getMaxAnisotropy();
+    const im=new Image();im.onload=()=>{const k=Math.min(920/im.width,920/im.height),w=im.width*k,h=im.height*k;x.drawImage(im,(1024-w)/2,(1024-h)/2,w,h);tex.needsUpdate=true};im.src=src;
+    const art=new T.Mesh(new T.PlaneGeometry(2.4,2.4),new T.MeshStandardMaterial({map:tex,roughness:.55,metalness:0,emissive:0xffffff,emissiveMap:tex,emissiveIntensity:.18}));art.position.set(0,2.75,.225);g.add(art);
+    const plaque=new T.Mesh(new T.BoxGeometry(.7,.16,.04),mGold);plaque.position.set(0,1,.12);g.add(plaque);
+    const sp=new T.SpotLight(0xfff0d6,3.2,14,.36,.55,1.3);sp.position.set(Math.sin(a)*6.5,8,Math.cos(a)*6.5);sp.target=art;scene.add(sp);
+    arts.push({art,sp});
+  });
+
+  /* ---------- floating glass title ---------- */
+  const title=new T.Group();title.position.set(0,3.6,0);scene.add(title);
+  function titleTex(color,glow){
+    const c=document.createElement('canvas');c.width=2048;c.height=640;const x=c.getContext('2d');
+    x.textAlign='center';x.textBaseline='middle';x.fillStyle=color;
+    if(glow){x.shadowColor=glow;x.shadowBlur=40}
+    x.font='600 300px Cinzel';x.fillText('SANAD',1024,250);
+    x.font='400 104px Cinzel';x.fillText('S T R A T E G I E S',1024,500);
+    const t=new T.CanvasTexture(c);t.encoding=T.sRGBEncoding;return t;
+  }
+  const TW=6.2,TH=TW*640/2048;
+  function buildTitle(){
+    while(title.children.length)title.remove(title.children[0]);
+    for(let i=0;i<14;i++){
+      const back=i<13,m=new T.MeshBasicMaterial({map:titleTex(back?'#9fb0c4':'#f6f1e6',back?null:'rgba(255,240,210,.8)'),transparent:true,opacity:back?.07:.92,depthWrite:false,blending:T.AdditiveBlending,fog:false});
+      const p=new T.Mesh(new T.PlaneGeometry(TW,TH),m);p.position.z=-(13-i)*.022;title.add(p);
+    }
+  }
+  (document.fonts?document.fonts.load('600 300px Cinzel'):Promise.resolve()).then(buildTitle,buildTitle);
+
+  /* ---------- camera stops (polar: angle deg, radius, height) ---------- */
+  const STOPS=[
+    {ca:0,cr:21,ch:2.1, la:0,lr:0,lh:3.3},          // outside the gate
+    {ca:0,cr:7.6,ch:2.3, la:0,lr:0,lh:3.5},         // under the title
+    {ca:-60,cr:5.2,ch:2.2, la:-60,lr:RW,lh:2.75},   // Toastella
+    {ca:-120,cr:5.2,ch:2.2, la:-120,lr:RW,lh:2.75}, // Nostalgia
+    {ca:-180,cr:7.6,ch:4.9, la:-180,lr:0,lh:3.1},   // up the stairs, looking back over the rotunda
+    {ca:-240,cr:5.2,ch:2.2, la:-240,lr:RW,lh:2.75}, // Pulse
+    {ca:-300,cr:5.2,ch:2.2, la:-300,lr:RW,lh:2.75}, // Sweet Batter
+    {ca:-360,cr:9.2,ch:1.7, la:-360,lr:0,lh:2.2}    // back to the title, looking up into the light
+  ];
+  const N=STOPS.length-1,ss=v=>v<=0?0:v>=1?1:v*v*(3-2*v);
+  function stopAt(f){
+    const i=Math.min(N-1,Math.floor(f)),t=f-i,u=ss((t-.2)/.6),A=STOPS[i],B=STOPS[i+1],L=(k)=>A[k]+(B[k]-A[k])*u;
+    const ca=L('ca')*D,la=L('la')*D,cr=L('cr'),lr=L('lr');
+    return {p:new T.Vector3(Math.sin(ca)*cr,L('ch'),Math.cos(ca)*cr),l:new T.Vector3(Math.sin(la)*lr,L('lh'),Math.cos(la)*lr)};
+  }
+  const tour=document.getElementById('tour');
+  const prog=()=>{const r=tour.getBoundingClientRect();return Math.max(0,Math.min(1,-r.top/(r.height-innerHeight)))};
+  const pos=new T.Vector3(),look=new T.Vector3();{const s=stopAt(prog()*N);pos.copy(s.p);look.copy(s.l)}
+
+  function size(){const w=innerWidth,h=innerHeight;R.setSize(w,h,false);cam.aspect=w/h;cam.fov=w/h<.8?68:52;cam.updateProjectionMatrix()}
+  addEventListener('resize',size);size();
+
+  const ovs=[...document.querySelectorAll('.ov')],count=document.getElementById('count'),cb=count.querySelector('b');
+  const workStops=[2,3,5,6];
+  let last=performance.now();
+  function loop(now){
+    const dt=Math.min(.05,(now-last)/1000);last=now;
+    const p=prog(),f=p*N,s=stopAt(f),k=1-Math.exp(-dt*4);
+    pos.lerp(s.p,k);look.lerp(s.l,k);cam.position.copy(pos);cam.lookAt(look);
+    // title always turns to face the viewer (yaw only) and breathes slowly
+    title.rotation.y=Math.atan2(pos.x-title.position.x,pos.z-title.position.z);
+    title.position.y=3.6+Math.sin(now*.0006)*.06;
+    const d=dust.geometry.attributes.position;for(let i=0;i<DN;i++){let y=d.array[i*3+1]+dt*.12;if(y>12)y=0;d.array[i*3+1]=y}d.needsUpdate=true;
+    // captions
+    ovs.forEach(o=>{const a=Math.max(0,Math.min(1,1-(Math.abs(f-(+o.dataset.k))-.1)*3.4));o.style.opacity=a.toFixed(3);o.classList.toggle('on',a>.6);
+      if(o.classList.contains('cap'))o.style.transform='translateY('+((1-a)*16).toFixed(1)+'px)'});
+    let near=-1,nd=9;workStops.forEach((w,i)=>{const dd=Math.abs(f-w);if(dd<nd){nd=dd;near=i}});
+    count.style.opacity=Math.max(0,1-(nd-.15)*3).toFixed(3);cb.textContent='0'+(near+1);
+    // dim the hall once the visitor scrolls past the tour into the text sections
+    const after=Math.max(0,-tour.getBoundingClientRect().bottom+innerHeight);cv.style.opacity=Math.max(.25,1-after/innerHeight).toFixed(3);
+    R.render(scene,cam);requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
