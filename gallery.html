@@ -420,46 +420,61 @@ body.flat .after{padding-top:8rem;background:none}
   }
   requestAnimationFrame(loop);
 
-  /* snap: once scrolling has fully stopped inside the tour, settle on a stop.
-     It follows the direction of travel: any real move goes on to the next stop that way,
-     and only a tiny nudge returns to where you were. Never acts while a finger is down
-     or while the page is still coasting. */
-  let snapT=0,touching=false,snapping=false,lastY=scrollY,dir=0;
+  /* one project per gesture: inside the tour, a swipe, a wheel/trackpad flick or an arrow key
+     moves exactly one stop, however slow or fast. After the last stop the page scrolls normally. */
   const fNow=()=>{const r=tour.getBoundingClientRect();return Math.max(0,Math.min(1,-r.top/(r.height-innerHeight)))*N};
-  let home=Math.round(fNow());
-  function snapTo(){
-    const r=tour.getBoundingClientRect(),span=r.height-innerHeight;
-    if(touching||snapping||r.top>0||r.bottom<innerHeight+2)return;
-    const f=fNow();
-    let k;
-    if(Math.abs(f-home)<.1)k=home;                      // barely moved: stay
-    else k=dir>0?Math.ceil(f-.02):Math.floor(f+.02);     // moved: continue the way you were going
-    k=Math.max(0,Math.min(N,k));
-    if(Math.abs(f-k)<.015){home=k;return}
-    glide(scrollY+r.top+span*k/N,k);
-  }
-  // our own short eased glide (browsers' smooth scroll is unreliable here); any wheel, touch or key cancels it
-  let gid=0;
-  function glide(y,k){
-    const y0=scrollY,d=y-y0,t0=performance.now(),dur=Math.min(700,320+Math.abs(d)*.6),id=++gid;snapping=true;
+  const tourTop=()=>scrollY+tour.getBoundingClientRect().top,span=()=>tour.offsetHeight-innerHeight;
+  const inTour=()=>{const r=tour.getBoundingClientRect();return r.top<=1&&r.bottom>=innerHeight-1};
+  let gid=0,busy=false,quietUntil=0;
+  function glide(y){
+    const y0=scrollY,d=y-y0,t0=performance.now(),dur=Math.min(900,420+Math.abs(d)*.25),id=++gid;busy=true;
     (function step(now){
       if(id!==gid)return;
-      const t=Math.min(1,Math.max(0,(now-t0)/dur)),e=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+      const t=Math.min(1,Math.max(0,(now-t0)/dur)),e=t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
       scrollTo(0,y0+d*e);
-      if(t<1)requestAnimationFrame(step);else{home=k;lastY=scrollY;setTimeout(()=>{if(id===gid)snapping=false},120)}
+      if(t<1)requestAnimationFrame(step);else setTimeout(()=>{if(id===gid)busy=false},60);
     })(t0);
   }
-  const cancel=()=>{if(snapping){gid++;snapping=false;home=Math.round(fNow())}};
-  addEventListener('wheel',cancel,{passive:true});addEventListener('keydown',cancel);
-  const hasEnd='onscrollend' in window;
-  const later=()=>{clearTimeout(snapT);snapT=setTimeout(snapTo,hasEnd?140:260)};
-  addEventListener('scroll',()=>{
-    const y=scrollY;if(Math.abs(y-lastY)>1)dir=y>lastY?1:-1;lastY=y;
-    if(!snapping){clearTimeout(snapT);if(!hasEnd)later()}
+  function go(dir){
+    if(busy||performance.now()<quietUntil)return;
+    const f=fNow();
+    const k=dir>0?Math.floor(f+.05)+1:Math.ceil(f-.05)-1;
+    if(k<0)return;
+    if(k>N){glide(tourTop()+span()+Math.round(innerHeight*.35));return}   // leave the gallery
+    glide(tourTop()+span()*k/N);
+  }
+  // touch: hold the page still while the finger moves, then step once on release
+  let ty0=null,tx0=0,moved=false;
+  addEventListener('touchstart',e=>{if(!inTour()||e.touches.length>1){ty0=null;return}ty0=e.touches[0].clientY;tx0=e.touches[0].clientX;moved=false},{passive:true});
+  addEventListener('touchmove',e=>{
+    if(ty0===null)return;
+    const dy=e.touches[0].clientY-ty0;
+    // leaving the bottom of the tour with an upward swipe at the last stop is handled on release
+    if(Math.abs(dy)>6)moved=true;
+    e.preventDefault();
+  },{passive:false});
+  addEventListener('touchend',e=>{
+    if(ty0===null)return;
+    const t=e.changedTouches[0],dy=t.clientY-ty0,dx=t.clientX-tx0;ty0=null;
+    if(moved&&Math.abs(dy)>24&&Math.abs(dy)>Math.abs(dx))go(dy<0?1:-1);
   },{passive:true});
-  if(hasEnd)addEventListener('scrollend',()=>{if(!snapping&&!touching)later()});
-  addEventListener('touchstart',()=>{touching=true;cancel();clearTimeout(snapT)},{passive:true});
-  addEventListener('touchend',()=>{touching=false;if(!hasEnd)later()},{passive:true});
+  // wheel and trackpad: one step per flick, ignoring the trailing inertia
+  let acc=0;
+  addEventListener('wheel',e=>{
+    if(!inTour())return;
+    const leavingTop=e.deltaY<0&&fNow()<.02;
+    if(leavingTop)return;
+    e.preventDefault();
+    const now=performance.now();
+    if(busy||now<quietUntil){quietUntil=now+220;acc=0;return}
+    acc+=e.deltaY;
+    if(Math.abs(acc)>30){go(acc>0?1:-1);acc=0;quietUntil=now+650}
+  },{passive:false});
+  addEventListener('keydown',e=>{
+    if(!inTour())return;
+    if(['ArrowDown','PageDown',' '].includes(e.key)){e.preventDefault();go(1)}
+    else if(['ArrowUp','PageUp'].includes(e.key)){e.preventDefault();go(-1)}
+  });
 })();
 </script>
 </body>
