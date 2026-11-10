@@ -26,7 +26,9 @@ a{color:inherit;text-decoration:none}
 .veil{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.55) 100%)}
 
 /* top bar */
-.top{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:calc(18px + env(safe-area-inset-top,0px)) max(22px,4vw) 18px}
+.top{position:fixed;top:0;left:0;right:0;z-index:20;background:linear-gradient(to bottom,rgba(6,6,8,.7),rgba(6,6,8,0));transition:background .35s,box-shadow .35s;display:flex;align-items:center;justify-content:space-between;padding:calc(18px + env(safe-area-inset-top,0px)) max(22px,4vw) 18px}
+.top.solid{background:rgba(6,6,8,.94);box-shadow:0 1px 0 var(--faint);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+body.flat .top{background:rgba(6,6,8,.94)}
 .badge{display:flex;align-items:center;gap:.8rem;font:400 .68rem var(--sans);letter-spacing:.22em;text-transform:uppercase;color:var(--mut)}
 .badge img{height:30px;width:auto;display:block}
 .badge span{padding-left:.8rem;border-left:1px solid var(--faint)}
@@ -68,7 +70,7 @@ a{color:inherit;text-decoration:none}
 
 /* after the tour */
 .after{position:relative;z-index:3;background:linear-gradient(to bottom,rgba(6,6,8,0),rgba(6,6,8,.92) 30vh,var(--bg) 60vh);padding:40vh max(22px,6vw) 6rem}
-.after section{max-width:1080px;margin:0 auto 9rem}
+.after section{max-width:1080px;margin:0 auto 9rem;scroll-margin-top:110px}
 .after .k{font:400 .7rem var(--sans);letter-spacing:.24em;text-transform:uppercase;color:var(--mut);margin-bottom:1rem}
 .after h2{font:400 clamp(2rem,4.4vw,3.4rem)/1.1 var(--serif);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2.6rem}
 .pk{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));border-top:1px solid var(--faint)}
@@ -375,7 +377,7 @@ body.flat .after{padding-top:8rem;background:none}
   function size(){const w=innerWidth,h=innerHeight;narrow=w/h<.8;R.setSize(w,h,false);cam.aspect=w/h;cam.fov=w/h<.8?68:52;cam.updateProjectionMatrix()}
   addEventListener('resize',size);size();
 
-  const ovs=[...document.querySelectorAll('.ov')],count=document.getElementById('count'),cb=count.querySelector('b');
+  const top=document.querySelector('.top'),ovs=[...document.querySelectorAll('.ov')],count=document.getElementById('count'),cb=count.querySelector('b');
   const workStops=[2,3,5,6],artStops=[2,3,5,6,7];
   const born=performance.now(),ramp=(t,d)=>Math.max(0,Math.min(1,(t-d)/1.2));
   const hemi=scene.children.find(o=>o.isHemisphereLight),oBase=oculus.intensity,wBase=warm.intensity;
@@ -387,6 +389,7 @@ body.flat .after{padding-top:8rem;background:none}
   function loop(now){
     const dt=Math.min(.05,(now-last)/1000);last=now;
     const p=prog(),f=p*N,s=stopAt(f),k=1-Math.exp(-dt*4);
+    const past=Math.max(0,Math.min(1,(innerHeight-tour.getBoundingClientRect().bottom)/(innerHeight*.35)));
     pos.lerp(s.p,k);look.lerp(s.l,k);cam.position.copy(pos);
     // a slight lean toward the cursor on desktop (about 1-2 degrees), never a roll
     lx+=(tx-lx)*k*.6;ly+=(ty-ly)*k*.6;fwd.subVectors(look,pos).normalize();side.crossVectors(fwd,UP).normalize();
@@ -401,16 +404,16 @@ body.flat .after{padding-top:8rem;background:none}
     sculpt.rotation.y=Math.atan2(pos.x,pos.z);
     // mini map
     meG.setAttribute('transform','translate('+(42+pos.x/RW*36).toFixed(1)+','+(42+pos.z/RW*36).toFixed(1)+') rotate('+(Math.atan2(fwd.x,-fwd.z)/D).toFixed(1)+')');
-    mapEl.style.opacity=Math.max(0,Math.min(1,(f-.5)*2)).toFixed(3);
+    mapEl.style.opacity=(Math.max(0,Math.min(1,(f-.5)*2))*(1-past)).toFixed(3);
     // title always turns to face the viewer (yaw only) and breathes slowly
     title.rotation.y=Math.atan2(pos.x-title.position.x,pos.z-title.position.z);
     title.position.y=4.7+Math.sin(now*.0006)*.06;
     const d=dust.geometry.attributes.position;for(let i=0;i<DN;i++){let y=d.array[i*3+1]+dt*.12;if(y>12)y=0;d.array[i*3+1]=y}d.needsUpdate=true;
     // captions
-    ovs.forEach(o=>{const a=Math.max(0,Math.min(1,1-(Math.abs(f-(+o.dataset.k))-.1)*3.4));o.style.opacity=a.toFixed(3);o.classList.toggle('on',a>.6);
+    ovs.forEach(o=>{const a=Math.max(0,Math.min(1,1-(Math.abs(f-(+o.dataset.k))-.1)*3.4))*(1-past);o.style.opacity=a.toFixed(3);o.classList.toggle('on',a>.6);
       if(o.classList.contains('cap'))o.style.transform='translateY('+((1-a)*16).toFixed(1)+'px)'});
     let near=-1,nd=9;workStops.forEach((w,i)=>{const dd=Math.abs(f-w);if(dd<nd){nd=dd;near=i}});
-    count.style.opacity=Math.max(0,1-(nd-.15)*3).toFixed(3);cb.textContent='0'+(near+1);
+    count.style.opacity=(Math.max(0,1-(nd-.15)*3)*(1-past)).toFixed(3);top.classList.toggle('solid',past>.5);cb.textContent='0'+(near+1);
     // dim the hall once the visitor scrolls past the tour into the text sections
     const after=Math.max(0,-tour.getBoundingClientRect().bottom+innerHeight);cv.style.opacity=Math.max(.25,1-after/innerHeight).toFixed(3);
     R.render(scene,cam);requestAnimationFrame(loop);
