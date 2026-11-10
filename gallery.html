@@ -176,7 +176,7 @@ body.flat .after{padding-top:8rem;background:none}
   <h2 style="font:400 clamp(2rem,4.4vw,3.4rem)/1.1 var(--serif);text-transform:uppercase;margin-bottom:2.6rem">Selected work</h2>
   <div class="grid">
     <div><img src="toastella-black.jpg" alt="Toastella logo"><h3>Toastella</h3><p>Food &amp; snack brand identity</p><a class="more" href="https://toastella.sanad-strategies.com/">Read more</a></div>
-    <div><img src="nostalgia-wordmark.jpg" alt="Nostalgia wordmark"><h3>Nostalgia</h3><p>Apparel wordmark and merch</p><a class="more" href="https://nostalgia.sanad-strategies.com/">Read more</a></div>
+    <div><img src="nostalgia-wordmark-dark.jpg" alt="Nostalgia wordmark in white on black"><h3>Nostalgia</h3><p>Apparel wordmark and merch</p><a class="more" href="https://nostalgia.sanad-strategies.com/">Read more</a></div>
     <div><img src="pulse-logo.png" alt="Pulse logo"><h3>Pulse</h3><p>Jewelry identity, photography, website</p><a class="more" href="https://pulse.sanad-strategies.com/">Read more</a></div>
     <div><img src="sweet-batter-logo.png" alt="Sweet Batter logo"><h3>Sweet Batter</h3><p>Bakery concept website</p><a class="more" href="https://sweet-batter.sanad-strategies.com/">Read more</a></div>
   </div>
@@ -293,7 +293,7 @@ body.flat .after{padding-top:8rem;background:none}
   const land=new T.Mesh(new T.CylinderGeometry(11.8,11.8,.25,64,1,false,205*D,30*D),mStone);land.position.y=4.85;scene.add(land);
 
   /* ---------- the works, framed in arched niches ---------- */
-  const WORKS=[['toastella-black.jpg','#000',-60],['nostalgia-wordmark.jpg','#fff',-120],['pulse-logo.png','#000',-240],['sweet-batter-logo.png','#000',-300],[null,'#0b0b0d',-330]];
+  const WORKS=[['toastella-black.jpg','#000',-60],['nostalgia-wordmark-dark.jpg','#000',-120],['pulse-logo.png','#000',-240],['sweet-batter-logo.png','#000',-300],[null,'#0b0b0d',-330]];
   const arts=[];
   WORKS.forEach(([src,bg,deg])=>{
     const a=deg*D,r=RW-.25,g=new T.Group();g.position.set(Math.sin(a)*r,0,Math.cos(a)*r);g.rotation.y=a+Math.PI;scene.add(g);
