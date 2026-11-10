@@ -416,6 +416,36 @@ body.flat .after{padding-top:8rem;background:none}
     R.render(scene,cam);requestAnimationFrame(loop);
   }
   requestAnimationFrame(loop);
+
+  /* snap: when the visitor stops scrolling inside the tour, glide to the nearest stop
+     so each work settles framed and centred. Never fires while a finger is down. */
+  let snapT=0,touching=false,snapping=false;
+  function snapTo(){
+    const r=tour.getBoundingClientRect(),span=r.height-innerHeight;
+    if(touching||snapping||r.top>0||r.bottom<innerHeight+2)return;
+    const f=Math.max(0,Math.min(1,-r.top/span))*N,k=Math.round(f);
+    if(Math.abs(f-k)<.015)return;
+    const y=scrollY+r.top+span*k/N;
+    glide(y);
+  }
+  // our own short eased glide (browsers' smooth scroll is unreliable here); any wheel, touch or key cancels it
+  let gid=0;
+  function glide(y){
+    const y0=scrollY,d=y-y0,t0=performance.now(),dur=Math.min(700,320+Math.abs(d)*.6),id=++gid;snapping=true;
+    (function step(now){
+      if(id!==gid)return;
+      const t=Math.min(1,(now-t0)/dur),e=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+      scrollTo(0,y0+d*e);
+      if(t<1)requestAnimationFrame(step);else setTimeout(()=>{if(id===gid)snapping=false},80);
+    })(t0);
+  }
+  const cancel=()=>{if(snapping){gid++;snapping=false}};
+  addEventListener('wheel',cancel,{passive:true});addEventListener('keydown',cancel);
+  const later=()=>{clearTimeout(snapT);snapT=setTimeout(snapTo,'onscrollend' in window?60:170)};
+  addEventListener('scroll',()=>{if(!snapping)later()},{passive:true});
+  if('onscrollend' in window)addEventListener('scrollend',()=>{if(!snapping)later()});
+  addEventListener('touchstart',()=>{touching=true;cancel();clearTimeout(snapT)},{passive:true});
+  addEventListener('touchend',()=>{touching=false;later()},{passive:true});
 })();
 </script>
 </body>
