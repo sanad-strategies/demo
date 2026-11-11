@@ -7,9 +7,6 @@
     "dev": "wrangler dev",
     "check": "tsc --noEmit"
   },
-  "dependencies": {
-    "@anthropic-ai/sdk": "^1.8.0"
-  },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260702.1",
     "typescript": "^5.9.3",

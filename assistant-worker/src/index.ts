@@ -1,17 +1,15 @@
 /**
- * Sanad website assistant.
+ * Sanad website assistant on Cloudflare Workers AI (free plan).
  *
- * The website chat widget posts the conversation here. This worker keeps the Claude key
- * secret, asks Claude for the next reply, and when Claude decides the visitor is a real
- * lead (by calling the hand_over_lead tool) it alerts Mano and returns a WhatsApp link
- * with the brief already written, so the visitor can continue with Mano directly.
+ * The website chat posts the conversation here. The worker asks a free Workers AI model for
+ * the next reply. When the model decides the visitor is a real lead it ends its reply with a
+ * HANDOVER line carrying the brief as JSON; the worker strips that line, alerts Mano (Telegram
+ * or email, both free) and returns a WhatsApp link to Mano with the brief already written.
  */
-import Anthropic from "@anthropic-ai/sdk";
 import { SYSTEM_PROMPT } from "./prompt";
 
 interface Env {
-  ANTHROPIC_API_KEY: string;
-  ANTHROPIC_BASE_URL?: string; // only for local testing against a mock
+  AI: Ai;
   ALLOWED_ORIGINS: string;
   MANO_WHATSAPP: string;
   TELEGRAM_BOT_TOKEN?: string;
@@ -22,6 +20,13 @@ interface Env {
 }
 
 type Turn = { role: "user" | "assistant"; content: string };
+type Lead = {
+  customer_name: string; brand: string; needs: string; budget: string; timeline: string;
+  contact: string; recommended_package: string; summary: string; urgent: boolean;
+};
+
+// A strong free model with good Arabic; Workers AI free plan has a daily allowance.
+const MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
 
 // Cost and abuse limits
 const MAX_USER_TURNS = 24;
@@ -29,38 +34,6 @@ const MAX_MESSAGE_CHARS = 1200;
 const MAX_HISTORY_CHARS = 16000;
 const RATE_WINDOW_MS = 60_000;
 const RATE_MAX_REQUESTS = 20; // per IP per minute, per worker instance
-
-const MODEL = "claude-opus-5-5";
-
-const HAND_OVER_TOOL: Anthropic.Beta.BetaTool = {
-  name: "hand_over_lead",
-  description:
-    "Hand a qualified lead over to Mano. Call this once you have the key details and the visitor wants to go ahead " +
-    "(asks for a quote, to start, to talk to Mano), or immediately for complaints, payment questions or existing clients. " +
-    "After it returns, tell the visitor to tap the WhatsApp button to continue with Mano.",
-  strict: true,
-  input_schema: {
-    type: "object",
-    additionalProperties: false,
-    required: ["customer_name", "brand", "needs", "budget", "timeline", "contact", "recommended_package", "summary", "urgent"],
-    properties: {
-      customer_name: { type: "string", description: "The visitor's name, or \"Unknown\"." },
-      brand: { type: "string", description: "Brand name and what they sell, or \"Unknown\"." },
-      needs: { type: "string", description: "What they need: identity, photography, website, or a mix." },
-      budget: { type: "string", description: "Budget as they stated it, or \"Not given\"." },
-      timeline: { type: "string", description: "When they want it, or \"Not given\"." },
-      contact: { type: "string", description: "Any contact detail or link they shared (Instagram, phone, email), or \"None\"." },
-      recommended_package: { type: "string", description: "First Time Offer, Glow Up, From A to Success, or Custom." },
-      summary: { type: "string", description: "Two or three sentences for Mano about the conversation, in English." },
-      urgent: { type: "boolean", description: "True for complaints, payment issues or existing clients." },
-    },
-  },
-};
-
-type Lead = {
-  customer_name: string; brand: string; needs: string; budget: string; timeline: string;
-  contact: string; recommended_package: string; summary: string; urgent: boolean;
-};
 
 const hits = new Map<string, number[]>();
 function rateLimited(ip: string): boolean {
@@ -103,36 +76,54 @@ function validTurns(input: unknown): Turn[] | null {
   return turns;
 }
 
+/** Pull the HANDOVER line out of the model's reply, if it wrote one. */
+function splitHandover(raw: string): { reply: string; lead: Lead | null } {
+  const m = raw.match(/\n?\s*HANDOVER:\s*(\{[\s\S]*\})\s*$/);
+  if (!m) return { reply: raw.trim(), lead: null };
+  const reply = raw.slice(0, m.index).trim();
+  try {
+    const d = JSON.parse(m[1]);
+    const s = (v: unknown, dflt: string) => (typeof v === "string" && v.trim() ? v.trim().slice(0, 400) : dflt);
+    return {
+      reply,
+      lead: {
+        customer_name: s(d.customer_name, "Unknown"),
+        brand: s(d.brand, "Unknown"),
+        needs: s(d.needs, "Not given"),
+        budget: s(d.budget, "Not given"),
+        timeline: s(d.timeline, "Not given"),
+        contact: s(d.contact, "None"),
+        recommended_package: s(d.recommended_package, "To confirm"),
+        summary: s(d.summary, "See the conversation below."),
+        urgent: d.urgent === true,
+      },
+    };
+  } catch {
+    return { reply, lead: null };
+  }
+}
+
 function whatsappLink(env: Env, lead: Lead): string {
   const parts = [
     `Hi Mano, I'm ${lead.customer_name === "Unknown" ? "coming from your website" : lead.customer_name}.`,
     lead.brand !== "Unknown" ? `Brand: ${lead.brand}.` : "",
-    `I need: ${lead.needs}.`,
+    lead.needs !== "Not given" ? `I need: ${lead.needs}.` : "",
     lead.budget !== "Not given" ? `Budget: ${lead.budget}.` : "",
     lead.timeline !== "Not given" ? `Timeline: ${lead.timeline}.` : "",
-    `Your assistant suggested ${lead.recommended_package}.`,
+    lead.recommended_package !== "To confirm" ? `Your assistant suggested ${lead.recommended_package}.` : "",
   ].filter(Boolean);
   return `https://wa.me/${env.MANO_WHATSAPP}?text=${encodeURIComponent(parts.join(" "))}`;
 }
 
 async function alertMano(env: Env, lead: Lead, transcript: Turn[]): Promise<boolean> {
   const head = lead.urgent ? "URGENT · Sanad website" : "New lead · Sanad website";
-  const lines = [
-    head,
-    "",
-    `Name: ${lead.customer_name}`,
-    `Brand: ${lead.brand}`,
-    `Needs: ${lead.needs}`,
-    `Budget: ${lead.budget}`,
-    `Timeline: ${lead.timeline}`,
-    `Contact: ${lead.contact}`,
-    `Suggested package: ${lead.recommended_package}`,
-    "",
-    lead.summary,
-    "",
+  const text = [
+    head, "",
+    `Name: ${lead.customer_name}`, `Brand: ${lead.brand}`, `Needs: ${lead.needs}`,
+    `Budget: ${lead.budget}`, `Timeline: ${lead.timeline}`, `Contact: ${lead.contact}`,
+    `Suggested package: ${lead.recommended_package}`, "", lead.summary, "",
     "The visitor was given a button to message you on WhatsApp with this brief.",
-  ];
-  const text = lines.join("\n");
+  ].join("\n");
   const convo = transcript.map((t) => `${t.role === "user" ? "Visitor" : "Assistant"}: ${t.content}`).join("\n\n");
 
   if (env.TELEGRAM_BOT_TOKEN && env.TELEGRAM_CHAT_ID) {
@@ -172,67 +163,32 @@ export default {
     const ip = request.headers.get("CF-Connecting-IP") ?? "unknown";
     if (rateLimited(ip)) return json({ error: "Too many messages. Please wait a minute." }, 429, headers);
 
-    let body: { messages?: unknown };
+    let body: { messages?: unknown; handedOver?: unknown };
     try { body = await request.json(); } catch { return json({ error: "Bad request" }, 400, headers); }
     const turns = validTurns(body.messages);
     if (!turns) return json({ error: "This conversation is too long or malformed. Please message us on WhatsApp." }, 400, headers);
+    const alreadyHandedOver = body.handedOver === true;
 
-    const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY, ...(env.ANTHROPIC_BASE_URL ? { baseURL: env.ANTHROPIC_BASE_URL } : {}) });
-    const messages: Anthropic.Beta.BetaMessageParam[] = turns.map((t) => ({ role: t.role, content: t.content }));
-    let lead: Lead | null = null;
-    let alerted = false;
-
+    let raw: string;
     try {
-      // At most one tool round: Claude may call hand_over_lead, then writes its closing line.
-      for (let round = 0; round < 2; round++) {
-        const response = await client.beta.messages.create({
-          model: MODEL,
-          max_tokens: 4000,
-          betas: ["server-side-fallback-2026-07-01"],
-          fallbacks: "default",
-          output_config: { effort: "low" },
-          system: [{ type: "text", text: SYSTEM_PROMPT, cache_control: { type: "ephemeral" } }],
-          tools: [HAND_OVER_TOOL],
-          messages,
-        });
-
-        if (response.stop_reason === "refusal") {
-          return json({ reply: "Sorry, I can't help with that here. You can message Mano directly on WhatsApp.", handoff: null }, 200, headers);
-        }
-
-        const toolUse = response.content.find((b): b is Anthropic.Beta.BetaToolUseBlock => b.type === "tool_use");
-        if (response.stop_reason === "tool_use" && toolUse && round === 0) {
-          lead = toolUse.input as Lead;
-          alerted = await alertMano(env, lead, turns).catch(() => false);
-          messages.push({ role: "assistant", content: response.content });
-          messages.push({
-            role: "user",
-            content: [{ type: "tool_result", tool_use_id: toolUse.id, content: "Handed over. A WhatsApp button with the brief is now shown to the visitor." }],
-          });
-          continue;
-        }
-
-        const reply = response.content
-          .filter((b): b is Anthropic.Beta.BetaTextBlock => b.type === "text")
-          .map((b) => b.text)
-          .join("\n")
-          .trim();
-        return json({
-          reply: reply || (lead ? "Mano will take it from here. Tap the button below to continue on WhatsApp." : "Could you tell me a bit more?"),
-          handoff: lead ? { whatsapp: whatsappLink(env, lead), package: lead.recommended_package, alerted } : null,
-        }, 200, headers);
-      }
-      return json({ reply: "Mano will take it from here. Tap the button below to continue on WhatsApp.", handoff: lead ? { whatsapp: whatsappLink(env, lead), package: lead.recommended_package, alerted } : null }, 200, headers);
+      const out = (await env.AI.run(MODEL, {
+        messages: [{ role: "system", content: SYSTEM_PROMPT }, ...turns],
+        max_tokens: 450,
+        temperature: 0.4,
+      })) as { response?: string };
+      raw = (out.response ?? "").trim();
     } catch (error) {
-      if (error instanceof Anthropic.RateLimitError) {
-        return json({ error: "The assistant is busy. Please try again in a moment." }, 503, headers);
-      }
-      if (error instanceof Anthropic.APIError) {
-        console.error(`Claude API error ${error.status}: ${error.message}`);
-        return json({ error: "The assistant is unavailable right now. Please message us on WhatsApp." }, 502, headers);
-      }
-      console.error(error);
-      return json({ error: "Something went wrong. Please message us on WhatsApp." }, 500, headers);
+      // Most often the free daily allowance is used up; the widget then points to WhatsApp.
+      console.error("Workers AI error", error);
+      return json({ error: "The assistant is resting for today. Please message Mano directly on WhatsApp." }, 503, headers);
     }
+
+    const { reply, lead } = splitHandover(raw);
+    let handoff: { whatsapp: string; package: string; alerted: boolean } | null = null;
+    if (lead && !alreadyHandedOver) {
+      const alerted = await alertMano(env, lead, turns).catch(() => false);
+      handoff = { whatsapp: whatsappLink(env, lead), package: lead.recommended_package, alerted };
+    }
+    return json({ reply: reply || "Could you tell me a bit more?", handoff }, 200, headers);
   },
 };

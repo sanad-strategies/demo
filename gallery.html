@@ -590,7 +590,7 @@ body.flat .after{padding-top:8rem;background:none}
     if(!ASSISTANT_URL){bubble('note','The assistant is being set up. For now, message Mano directly:');waButton(WA);state.turns.pop();save();return}
     send.disabled=true;const dots=document.createElement('div');dots.className='sa-dots';dots.innerHTML='<span></span><span></span><span></span>';log.appendChild(dots);log.scrollTop=log.scrollHeight;
     try{
-      const r=await fetch(ASSISTANT_URL+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:state.turns})});
+      const r=await fetch(ASSISTANT_URL+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:state.turns,handedOver:!!state.handoff})});
       const data=await r.json().catch(()=>({}));dots.remove();
       if(!r.ok||!data.reply){state.turns.pop();save();bubble('note',data.error||'Something went wrong. You can message Mano on WhatsApp:');waButton(WA);return}
       state.turns.push({role:'assistant',content:data.reply});bubble('a',data.reply);
