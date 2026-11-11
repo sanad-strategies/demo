@@ -76,8 +76,15 @@ body.flat .top{background:rgba(6,6,8,.94)}
 .pk{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));border-top:1px solid var(--faint)}
 .pk article{padding:2rem 2rem 2.2rem 0;border-bottom:1px solid var(--faint)}
 .pk article+article{padding-left:2rem;border-left:1px solid var(--faint)}
-.pk h3{font:400 1.3rem var(--serif);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.4rem}
-.pk .price{font:400 .8rem var(--sans);letter-spacing:.18em;color:var(--gold);margin-bottom:1rem}
+.pk h3{font:400 1.3rem var(--serif);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.7rem}
+.pk .who{font:400 .68rem var(--sans);letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:.7rem}
+.pk ul{list-style:none;margin:1.1rem 0 1.3rem;display:grid;gap:.45rem}
+.pk li{position:relative;padding-left:1.1rem;color:var(--ink);font-size:.9rem;opacity:.85}
+.pk li::before{content:"";position:absolute;left:0;top:.7em;width:.5rem;height:1px;background:var(--gold)}
+.pk .from{font:400 .72rem var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--mut);margin:0}
+.pk-lead{color:var(--mut);max-width:52ch;margin:-1.4rem 0 2.4rem}
+.pk-quote{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1.2rem;margin-top:2.4rem}
+.pk-quote p{color:var(--ink);font:400 1.05rem var(--serif);letter-spacing:.02em;max-width:46ch}
 .pk p{color:var(--mut);font-size:.95rem}
 .contact{text-align:center}
 .contact p{color:var(--mut);max-width:46ch;margin:0 auto 2rem}
@@ -188,10 +195,33 @@ body.flat .after{padding-top:8rem;background:none}
   <section id="packages">
     <p class="k">Ways to start</p>
     <h2>Packages</h2>
+    <p class="pk-lead">Pick a starting point, not a straitjacket. Every package can be shaped around what your brand needs.</p>
     <div class="pk">
-      <article><h3>First Time Offer</h3><p class="price">1,500 – 2,500 EGP</p><p>One deliverable done properly: a logo and small colour system, or a styled product photo set. One round of revisions.</p></article>
-      <article><h3>Glow Up</h3><p class="price">4,000 – 6,000 EGP</p><p>Two pieces working together: identity with product photography, or identity with a website. Two rounds of revisions.</p></article>
-      <article><h3>From A to Success</h3><p class="price">6,000 – 10,000 EGP</p><p>Identity, photography and a website built as one system from day one. Full revision support until it's right.</p></article>
+      <article>
+        <p class="who">For a first real look</p>
+        <h3>First Time Offer</h3>
+        <p>A low-risk way to see what a real brand identity feels like: one piece, done properly.</p>
+        <ul><li>A logo with a small colour system, or a styled product photo set</li><li>One round of revisions</li></ul>
+        <p class="from">Starting from 1,500 EGP</p>
+      </article>
+      <article>
+        <p class="who">For a brand ready to level up</p>
+        <h3>Glow Up</h3>
+        <p>Two pieces working together, usually the combination that moves the needle for a small brand.</p>
+        <ul><li>Identity with product photography, or identity with a website</li><li>Two rounds of revisions</li></ul>
+        <p class="from">Starting from 4,000 EGP</p>
+      </article>
+      <article>
+        <p class="who">For starting properly, from scratch</p>
+        <h3>From A to Success</h3>
+        <p>Identity, photography and a website built as one system from day one, instead of stitched together later.</p>
+        <ul><li>Brand identity, product photography and a website</li><li>Full revision support until it's right</li></ul>
+        <p class="from">Starting from 6,000 EGP</p>
+      </article>
+    </div>
+    <div class="pk-quote">
+      <p>Every brand is different. Tell us about yours and we'll give you an exact quote.</p>
+      <a class="btn" href="https://wa.me/201555689445?text=Hi%20Mano%2C%20I%27d%20like%20a%20quote%20for%20my%20brand." target="_blank" rel="noopener">Get your quote</a>
     </div>
   </section>
   <section id="contact" class="contact">
