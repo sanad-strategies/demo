@@ -122,7 +122,7 @@ body.flat .after{padding-top:8rem;background:none}
   <nav class="menu" aria-label="Main">
     <a href="#packages">Packages</a>
     <a href="#contact">Contact</a>
-    <a class="cta" href="https://wa.me/12024748975?text=Hi%20Sanad%2C%20I%27d%20like%20to%20talk%20about%20my%20brand." target="_blank" rel="noopener">Contact Us</a>
+    <a class="cta" href="#contact">Contact Us</a>
   </nav>
 </header>
 
@@ -168,7 +168,7 @@ body.flat .after{padding-top:8rem;background:none}
   <p class="k">The fifth frame · Still empty</p>
   <h2>Your brand<br>could stand here</h2>
   <p class="d">Every work in this hall started as a conversation. Tell us what you sell and who it's for.</p>
-  <a class="btn" href="https://wa.me/12024748975?text=Hi%20Sanad%2C%20I%27d%20like%20to%20talk%20about%20my%20brand." target="_blank" rel="noopener">Contact Us</a>
+  <a class="btn" href="#contact">Contact Us</a>
 </div>
 <div class="count" id="count"><b>01</b> / 04</div>
 <svg class="map" id="map" viewBox="0 0 84 84" aria-hidden="true">
@@ -221,14 +221,13 @@ body.flat .after{padding-top:8rem;background:none}
     </div>
     <div class="pk-quote">
       <p>Every brand is different. Tell us about yours and we'll give you an exact quote.</p>
-      <a class="btn" href="https://wa.me/201555689445?text=Hi%20Mano%2C%20I%27d%20like%20a%20quote%20for%20my%20brand." target="_blank" rel="noopener">Get your quote</a>
+      <a class="btn" href="#contact">Get your quote</a>
     </div>
   </section>
-  <section id="contact" class="contact">
-    <p class="k">Let's build something</p>
-    <h2>Contact us</h2>
-    <p>Tell us about your brand on WhatsApp: what you sell, who buys it, and where you want it to go.</p>
-    <a class="btn" href="https://wa.me/12024748975?text=Hi%20Sanad%2C%20I%27d%20like%20to%20talk%20about%20my%20brand." target="_blank" rel="noopener">Contact Us</a>
+  <section id="contact" class="contact quote">
+    <div class="q-top"><p class="k" id="q-eyebrow">Get a quote · Six quick taps</p><button class="q-lang" id="q-lang" type="button" aria-label="Switch language">ع</button></div>
+    <div class="q-bar" aria-hidden="true"><i id="q-fill"></i></div>
+    <div class="q-card" id="q-card" aria-live="polite"></div>
   </section>
   <footer><span>© 2026 Sanad Strategies</span><span>Based in Egypt</span></footer>
 </div>
@@ -519,163 +518,137 @@ body.flat .after{padding-top:8rem;background:none}
   });
 })();
 </script>
-<!-- Sanad assistant: website chat that hands real leads to Mano on WhatsApp -->
+<!-- Sanad quote form: one multiple-choice question at a time, ending in WhatsApp to Mano -->
 <style>
-.sa-launch{position:fixed;z-index:40;right:max(18px,env(safe-area-inset-right,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:.6rem;padding:.85rem 1.15rem;border:1px solid rgba(236,231,221,.35);background:rgba(10,10,12,.82);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:var(--ink);font:500 .72rem var(--sans);letter-spacing:.2em;text-transform:uppercase;cursor:pointer;border-radius:999px;transition:border-color .3s,transform .3s}
+.contact.quote{text-align:start;max-width:760px}
+.contact.quote p{margin-inline:0;max-width:none}
+.contact.quote .q-why{max-width:52ch;margin:-1rem 0 1.6rem}
+.q-top{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1rem}
+.q-top .k{margin:0}
+.q-lang{background:none;border:1px solid var(--faint);color:var(--ink);font:400 .9rem var(--sans);width:38px;height:38px;border-radius:50%;cursor:pointer}
+.q-lang:hover{border-color:var(--gold)}
+.q-bar{height:1px;background:var(--faint);margin-bottom:2.4rem}
+.q-bar i{display:block;height:1px;width:0;background:var(--gold);box-shadow:0 0 8px rgba(201,164,92,.6);transition:width .45s ease}
+.q-card{min-height:340px}
+.q-step{font:400 .7rem var(--sans);letter-spacing:.22em;text-transform:uppercase;color:var(--mut);margin-bottom:.8rem}
+.q-card h3{font:400 clamp(1.6rem,3.6vw,2.4rem)/1.15 var(--serif);text-transform:uppercase;letter-spacing:.03em;margin-bottom:1.8rem;text-wrap:balance}
+.q-opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.7rem}
+.q-opt{display:flex;align-items:center;gap:.8rem;padding:1.05rem 1.1rem;border:1px solid var(--faint);background:rgba(236,231,221,.03);color:var(--ink);font:400 .95rem var(--sans);text-align:start;cursor:pointer;transition:border-color .2s,background .2s,color .2s,transform .2s}
+.q-opt:hover,.q-opt:focus-visible{border-color:var(--gold);transform:translateY(-2px)}
+.q-opt.on{background:var(--gold);border-color:var(--gold);color:#0b0b0d}
+.q-opt svg{flex:none;width:26px;height:26px;stroke:var(--gold);fill:none;stroke-width:1.3}
+.q-opt.on svg{stroke:#0b0b0d}
+.q-nav{display:flex;justify-content:space-between;align-items:center;margin-top:1.8rem;min-height:2.4rem}
+.q-back{background:none;border:0;color:var(--mut);font:400 .72rem var(--sans);letter-spacing:.2em;text-transform:uppercase;cursor:pointer}
+.q-back:hover{color:var(--ink)}
+.q-field{display:flex;gap:.6rem;flex-wrap:wrap}
+.q-field input{flex:1 1 240px;min-width:0;padding:1rem 1.1rem;background:rgba(236,231,221,.04);border:1px solid var(--faint);color:var(--ink);font:300 1rem var(--sans)}
+.q-field input:focus{outline:none;border-color:var(--gold)}
+.q-sum{list-style:none;border-top:1px solid var(--faint);margin:0 0 1.8rem}
+.q-sum li{display:flex;justify-content:space-between;gap:1rem;padding:.7rem 0;border-bottom:1px solid var(--faint);font-size:.92rem}
+.q-sum span{color:var(--mut)}
+.q-pkg{font:400 .7rem var(--sans);letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:.6rem}
+.q-why{color:var(--mut);max-width:52ch;margin:-1rem 0 1.6rem}
+.q-wa{display:inline-block;padding:1.05rem 1.6rem;background:var(--gold);color:#0b0b0d;font:500 .76rem var(--sans);letter-spacing:.2em;text-transform:uppercase;transition:background .3s}
+.q-wa:hover{background:#dcb97a}
+.q-again{display:block;margin-top:1.2rem;background:none;border:0;color:var(--mut);font:400 .7rem var(--sans);letter-spacing:.2em;text-transform:uppercase;cursor:pointer;text-decoration:underline}
+.q-fade{animation:qin .35s ease}
+@keyframes qin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.quote[dir="rtl"] .q-card h3{text-transform:none;letter-spacing:0;font-family:var(--sans);font-weight:400}
+.quote[dir="rtl"] .q-step{letter-spacing:.05em}
+.sa-launch{position:fixed;z-index:40;right:max(18px,env(safe-area-inset-right,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:.6rem;padding:.85rem 1.15rem;border:1px solid rgba(236,231,221,.35);background:rgba(10,10,12,.82);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:var(--ink);font:500 .72rem var(--sans);letter-spacing:.2em;text-transform:uppercase;border-radius:999px;transition:border-color .3s,transform .3s,opacity .3s}
 .sa-launch:hover{border-color:var(--gold);transform:translateY(-2px)}
 .sa-launch i{width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 10px var(--gold)}
-.sa-panel{position:fixed;z-index:41;right:max(18px,env(safe-area-inset-right,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));width:min(380px,calc(100vw - 36px));height:min(560px,calc(100vh - 120px));display:flex;flex-direction:column;background:rgba(10,10,12,.94);border:1px solid rgba(236,231,221,.16);box-shadow:0 30px 80px rgba(0,0,0,.6);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);opacity:0;transform:translateY(16px);pointer-events:none;transition:opacity .3s,transform .3s}
-.sa-panel.open{opacity:1;transform:none;pointer-events:auto}
-.sa-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1rem 1.1rem;border-bottom:1px solid var(--faint)}
-.sa-head b{display:block;font:400 1rem var(--serif);letter-spacing:.08em;text-transform:uppercase}
-.sa-head small{font:400 .66rem var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--mut)}
-.sa-x{background:none;border:1px solid var(--faint);color:var(--ink);width:34px;height:34px;border-radius:50%;cursor:pointer;font:300 1rem var(--sans)}
-.sa-x:hover{border-color:var(--gold)}
-.sa-log{flex:1;overflow-y:auto;padding:1rem 1.1rem;display:flex;flex-direction:column;gap:.7rem;overscroll-behavior:contain}
-.sa-m{max-width:85%;padding:.65rem .85rem;font:300 .92rem/1.5 var(--sans);white-space:pre-wrap;word-wrap:break-word}
-.sa-m.a{align-self:flex-start;background:rgba(236,231,221,.07);border:1px solid var(--faint)}
-.sa-m.u{align-self:flex-end;background:var(--ink);color:#0b0b0d}
-.sa-m.note{align-self:center;max-width:100%;background:none;border:0;color:var(--mut);font-size:.8rem;text-align:center}
-.sa-dots{align-self:flex-start;display:flex;gap:4px;padding:.8rem .9rem}
-.sa-dots span{width:6px;height:6px;border-radius:50%;background:var(--mut);animation:sad 1.2s infinite ease-in-out}
-.sa-dots span:nth-child(2){animation-delay:.15s}.sa-dots span:nth-child(3){animation-delay:.3s}
-@keyframes sad{0%,80%,100%{opacity:.25}40%{opacity:1}}
-.sa-wa{display:block;margin:.2rem 0 .3rem;padding:.9rem 1rem;border:1px solid var(--gold);color:var(--gold);font:500 .74rem var(--sans);letter-spacing:.18em;text-transform:uppercase;text-align:center;transition:background .3s,color .3s}
-.sa-wa:hover{background:var(--gold);color:#0b0b0d}
-.sa-form{display:flex;gap:.5rem;padding:.8rem;border-top:1px solid var(--faint)}
-.sa-form textarea{flex:1;min-width:0;resize:none;height:44px;max-height:120px;padding:.7rem .8rem;background:rgba(236,231,221,.05);border:1px solid var(--faint);color:var(--ink);font:300 .92rem/1.4 var(--sans)}
-.sa-form textarea:focus{outline:none;border-color:rgba(236,231,221,.4)}
-.sa-form button{flex:none;padding:0 1rem;border:1px solid var(--ink);background:var(--ink);color:#0b0b0d;font:500 .7rem var(--sans);letter-spacing:.18em;text-transform:uppercase;cursor:pointer}
-.sa-form button:disabled{opacity:.4;cursor:default}
-@media (max-width:760px){
-  .sa-launch{padding:.75rem 1rem}
-  .sa-panel{right:0;left:0;bottom:0;width:auto;height:min(78vh,620px);border-left:0;border-right:0;border-bottom:0;padding-bottom:env(safe-area-inset-bottom,0px)}
-}
-.sa-chips{display:flex;flex-wrap:wrap;gap:.45rem;align-self:stretch}
-.sa-chips button{padding:.55rem .8rem;border:1px solid rgba(201,164,92,.55);background:none;color:var(--ink);font:400 .85rem var(--sans);cursor:pointer;transition:background .2s,color .2s}
-.sa-chips button:hover,.sa-chips button:focus-visible{background:var(--gold);color:#0b0b0d}
-.sa-chips .note{flex-basis:100%;text-align:left;padding:0;margin-top:.1rem}
-.sa-restart{align-self:center;background:none;border:0;color:var(--mut);font:400 .7rem var(--sans);letter-spacing:.18em;text-transform:uppercase;cursor:pointer;text-decoration:underline}
-@media (prefers-reduced-motion:reduce){.sa-panel,.sa-launch{transition:none}.sa-dots span{animation:none}}
+.sa-launch.hide{opacity:0;pointer-events:none}
+@media (max-width:760px){.q-opts{grid-template-columns:1fr 1fr}.q-opt{padding:.95rem .9rem;font-size:.9rem}.q-card{min-height:380px}}
+@media (prefers-reduced-motion:reduce){.q-fade{animation:none}.q-bar i,.q-opt,.sa-launch{transition:none}}
 </style>
-<button class="sa-launch" id="sa-launch" type="button" aria-controls="sa-panel" aria-expanded="false"><i></i>Chat with us</button>
-<section class="sa-panel" id="sa-panel" role="dialog" aria-label="Chat with Sanad" aria-hidden="true">
-  <div class="sa-head"><div><b>Sanad Assistant</b><small>Six quick questions</small></div><button class="sa-x" id="sa-x" type="button" aria-label="Close chat">✕</button></div>
-  <div class="sa-log" id="sa-log" aria-live="polite"></div>
-  <form class="sa-form" id="sa-form"><label for="sa-in" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Your message</label><textarea id="sa-in" rows="1" maxlength="1200" placeholder="Type your answer…"></textarea><button id="sa-send" type="submit">Send</button></form>
-</section>
+<a class="sa-launch" id="sa-launch" href="#contact"><i></i>Get a quote</a>
 <script>
-/* Sanad guided chat: six short questions, a package suggestion, then WhatsApp with the brief.
-   Runs entirely in the browser: no AI, no server, no cost. */
 (function(){
   const MANO='201555689445';
-  const $=id=>document.getElementById(id),panel=$('sa-panel'),log=$('sa-log'),form=$('sa-form'),inp=$('sa-in'),send=$('sa-send'),launch=$('sa-launch');
+  const $=id=>document.getElementById(id),card=$('q-card'),fill=$('q-fill'),sec=$('contact'),launch=$('sa-launch');
   const track=(e,p)=>{try{window.posthog&&posthog.capture&&posthog.capture(e,p)}catch(_){}};
+  // small original line icons for the first question
+  const I={
+    id:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M8 15l4-7 4 7M9.5 12.5h5"/></svg>',
+    photo:'<svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="12" rx="1"/><path d="M8 7l1.5-2h5L16 7"/><circle cx="12" cy="13" r="3.2"/></svg>',
+    web:'<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="1"/><path d="M3 9h18M6 7h.01M8 7h.01"/></svg>',
+    mix:'<svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8"/><rect x="13" y="3" width="8" height="8"/><rect x="3" y="13" width="8" height="8"/><rect x="13" y="13" width="8" height="8"/></svg>',
+    unsure:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M9.8 9.6a2.3 2.3 0 1 1 3.1 2.2c-.6.3-.9.8-.9 1.4v.4M12 16.4h.01"/></svg>'};
   const T={
-    en:{hello:"Hi! I'm Sanad's assistant 👋 Six quick questions and I'll point you to the right package, then Mano takes it from there.",
+    en:{eyebrow:'Get a quote · Six quick taps',step:(i,n)=>`Question ${i} of ${n}`,back:'Back',next:'Continue',again:'Start again',
       q:[
-        {k:'name',text:"What should we call you? Your name or your brand's name, either is fine."},
-        {k:'product',text:"What do you sell?",ph:"e.g. handmade silver rings"},
-        {k:'where',text:"Where do you sell it?",opts:["Instagram","My own website","A physical shop","Not launched yet"]},
-        {k:'need',text:"What do you need help with?",opts:["Brand identity","Product photography","A website","A mix of these","Not sure yet"]},
-        {k:'budget',text:"Roughly what budget do you have in mind?",opts:["Under 2,500 EGP","2,500 – 6,000 EGP","6,000 – 10,000 EGP","Not sure yet"]},
-        {k:'when',text:"When would you like it ready?",opts:["As soon as possible","This month","In 1–3 months","Just exploring"]}],
-      thanks:n=>`Thanks, ${n}!`,
-      pick:(p,why)=>`Based on what you told me, ${p} fits best. ${why} Mano will confirm the exact scope and price with you.`,
-      why:{first:"It's one focused piece done properly, a great first step.",glow:"It brings two pieces together, usually what moves the needle for a growing brand.",full:"It builds identity, photography and a website as one system from day one."},
-      tap:"Tap below to send Mano your brief on WhatsApp. He'll reply personally.",
-      btn:"Continue with Mano on WhatsApp →",restart:"Start over",ph:"Type your answer…",or:"or type your own answer below",
-      brief:a=>`Hi Mano, I'm ${a.name}. I sell ${a.product} (${a.where}). I need: ${a.need}. Budget: ${a.budget}. Timeline: ${a.when}. Your website suggested ${a.pkg}.`},
-    ar:{hello:"أهلاً! أنا مساعد سند 👋 ست أسئلة سريعة وهقولك الباكدج المناسبة، وبعدها مانو هيكمل معاك.",
+        {k:'need',h:'What do you need help with?',o:[['Brand identity','id'],['Product photography','photo'],['A website','web'],['A mix of these','mix'],['Not sure yet','unsure']]},
+        {k:'type',h:'What kind of brand is it?',o:['Jewelry & accessories','Clothing & streetwear','Food & drinks','Beauty & care','Something else']},
+        {k:'where',h:'Where do you sell?',o:['Instagram','My own website','A physical shop','Not launched yet']},
+        {k:'budget',h:'Roughly what budget?',o:['Under 2,500 EGP','2,500 – 6,000 EGP','6,000 – 10,000 EGP','Not sure yet']},
+        {k:'when',h:'When do you need it?',o:['As soon as possible','This month','In 1–3 months','Just exploring']},
+        {k:'name',h:"Last one: what's your name or brand?",input:'Your name or brand name'}],
+      done:'Your best fit',why:{first:'One focused piece, done properly. A great first step.',glow:'Two pieces working together, usually what moves the needle for a growing brand.',full:'Identity, photography and a website built as one system from day one.'},
+      labels:{need:'Need',type:'Brand',where:'Sells on',budget:'Budget',when:'Timeline'},
+      note:'Mano confirms the exact scope and price with you on WhatsApp.',wa:'Send to Mano on WhatsApp →',
+      brief:a=>`Hi Mano, I'm ${a.name}. ${a.type} brand selling on ${a.where}. I need: ${a.need}. Budget: ${a.budget}. Timeline: ${a.when}. Your website suggested ${a.pkg}.`},
+    ar:{eyebrow:'اطلب عرض سعر · ست ضغطات',step:(i,n)=>`سؤال ${i} من ${n}`,back:'رجوع',next:'كمّل',again:'ابدأ من الأول',
       q:[
-        {k:'name',text:"نقولك إيه؟ اسمك أو اسم البراند، أي واحد فيهم."},
-        {k:'product',text:"بتبيع إيه؟",ph:"مثلاً: خواتم فضة هاند ميد"},
-        {k:'where',text:"بتبيع فين؟",opts:["إنستجرام","موقعي الخاص","محل","لسه مبدأتش"]},
-        {k:'need',text:"محتاج مساعدة في إيه؟",opts:["هوية للبراند","تصوير منتجات","موقع إلكتروني","أكتر من حاجة","لسه مش متأكد"]},
-        {k:'budget',text:"الميزانية في حدود كام تقريباً؟",opts:["أقل من 2,500 جنيه","2,500 – 6,000 جنيه","6,000 – 10,000 جنيه","لسه مش متأكد"]},
-        {k:'when',text:"عايزه يكون جاهز إمتى؟",opts:["في أسرع وقت","الشهر ده","خلال شهر لـ 3 شهور","بستكشف بس"]}],
-      thanks:n=>`شكراً يا ${n}!`,
-      pick:(p,why)=>`على حسب كلامك، أنسب باكدج ليك هي ${p}. ${why} مانو هيأكد معاك التفاصيل والسعر النهائي.`,
-      why:{first:"حاجة واحدة معمولة صح، بداية ممتازة.",glow:"بتجمع حاجتين مع بعض، ودي غالباً اللي بتفرق مع البراند اللي بيكبر.",full:"بتبني الهوية والتصوير والموقع كنظام واحد من الأول."},
-      tap:"دوس تحت عشان تبعت لمانو ملخص طلبك على واتساب، وهو هيرد عليك بنفسه.",
-      btn:"كمّل مع مانو على واتساب ←",restart:"ابدأ من الأول",ph:"اكتب إجابتك…",or:"أو اكتب إجابتك تحت",
-      brief:a=>`أهلاً يا مانو، أنا ${a.name}. ببيع ${a.product} (${a.where}). محتاج: ${a.need}. الميزانية: ${a.budget}. الوقت: ${a.when}. الموقع رشحلي ${a.pkg}.`}
-  };
-  const PK={first:{en:"First Time Offer",ar:"First Time Offer"},glow:{en:"Glow Up",ar:"Glow Up"},full:{en:"From A to Success",ar:"From A to Success"}};
-  const KEY='sanad-guided-v1';
-  let st={lang:null,step:-1,a:{},done:false};
-  try{const s=JSON.parse(sessionStorage.getItem(KEY)||'null');if(s&&typeof s.step==='number')st=s}catch(_){}
+        {k:'need',h:'محتاج مساعدة في إيه؟',o:[['هوية للبراند','id'],['تصوير منتجات','photo'],['موقع إلكتروني','web'],['أكتر من حاجة','mix'],['لسه مش متأكد','unsure']]},
+        {k:'type',h:'البراند بتاعك في مجال إيه؟',o:['مجوهرات وإكسسوارات','ملابس وستريت وير','أكل ومشروبات','تجميل وعناية','حاجة تانية']},
+        {k:'where',h:'بتبيع فين؟',o:['إنستجرام','موقعي الخاص','محل','لسه مبدأتش']},
+        {k:'budget',h:'الميزانية في حدود كام تقريباً؟',o:['أقل من 2,500 جنيه','2,500 – 6,000 جنيه','6,000 – 10,000 جنيه','لسه مش متأكد']},
+        {k:'when',h:'محتاجه إمتى؟',o:['في أسرع وقت','الشهر ده','خلال شهر لـ 3 شهور','بستكشف بس']},
+        {k:'name',h:'آخر سؤال: اسمك أو اسم البراند؟',input:'اسمك أو اسم البراند'}],
+      done:'الأنسب ليك',why:{first:'حاجة واحدة معمولة صح، بداية ممتازة.',glow:'حاجتين شغالين مع بعض، ودي غالباً اللي بتفرق مع البراند اللي بيكبر.',full:'الهوية والتصوير والموقع كنظام واحد من الأول.'},
+      labels:{need:'محتاج',type:'المجال',where:'بيبيع على',budget:'الميزانية',when:'الوقت'},
+      note:'مانو هيأكد معاك التفاصيل والسعر النهائي على واتساب.',wa:'ابعت لمانو على واتساب ←',
+      brief:a=>`أهلاً يا مانو، أنا ${a.name}. براند ${a.type} وببيع على ${a.where}. محتاج: ${a.need}. الميزانية: ${a.budget}. الوقت: ${a.when}. الموقع رشحلي ${a.pkg}.`}};
+  const PKG={first:'First Time Offer',glow:'Glow Up',full:'From A to Success'};
+  const KEY='sanad-quote-v1';
+  let st={lang:document.documentElement.lang==='ar'?'ar':'en',i:0,a:{},ix:{}};
+  try{const s=JSON.parse(sessionStorage.getItem(KEY)||'null');if(s&&typeof s.i==='number')st=s}catch(_){}
   const save=()=>{try{sessionStorage.setItem(KEY,JSON.stringify(st))}catch(_){}};
+  const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
-  function bubble(cls,text){const d=document.createElement('div');d.className='sa-m '+cls;d.dir='auto';d.textContent=text;log.appendChild(d);log.scrollTop=log.scrollHeight;return d}
-  function chips(list,onPick,hint){const w=document.createElement('div');w.className='sa-chips';
-    list.forEach(o=>{const b=document.createElement('button');b.type='button';b.textContent=o;b.dir='auto';b.addEventListener('click',()=>{w.remove();onPick(o)});w.appendChild(b)});
-    log.appendChild(w);if(hint){const h=document.createElement('div');h.className='sa-m note';h.textContent=hint;w.appendChild(h)}log.scrollTop=log.scrollHeight}
-  function link(href,text,cls){const a=document.createElement('a');a.className=cls||'sa-wa';a.href=href;a.target='_blank';a.rel='noopener';a.textContent=text;log.appendChild(a);log.scrollTop=log.scrollHeight;return a}
-
-  // which package fits: by what they need, then by budget
-  function recommend(a,L){
-    const q=T[L].q, need=q[3].opts.indexOf(a.need), bud=q[4].opts.indexOf(a.budget);
-    const byBudget=bud===0?'first':bud===1?'glow':bud===2?'full':null;
-    if(need===2)return bud===2?'full':'glow';           // website: at least identity + website
-    if(need===3)return bud===2?'full':'glow';           // a mix
-    if(need===0||need===1)return bud===2?'glow':'first'; // one piece; bigger budget gets two
-    return byBudget||'glow';                            // not sure / typed answer
+  function recommend(){ // by what they need, then by budget
+    const need=st.ix.need,b=st.ix.budget;
+    if(need===2||need===3)return b===2?'full':'glow';
+    if(need===0||need===1)return b===2?'glow':'first';
+    return b===0?'first':b===2?'full':'glow';
   }
-
-  function ask(){
-    const L=st.lang,q=T[L].q[st.step];
-    bubble('a',q.text);
-    inp.placeholder=q.ph||T[L].ph;inp.dir='auto';
-    if(q.opts)chips(q.opts,v=>answer(v),T[L].or);
-    setTimeout(()=>inp.focus(),50);
+  function render(){
+    const L=T[st.lang],n=L.q.length;
+    sec.dir=st.lang==='ar'?'rtl':'ltr';$('q-lang').textContent=st.lang==='ar'?'EN':'ع';$('q-eyebrow').textContent=L.eyebrow;
+    fill.style.width=(Math.min(st.i,n)/n*100)+'%';
+    if(st.i>=n)return result();
+    const q=L.q[st.i];let h=`<div class="q-fade"><p class="q-step">${L.step(st.i+1,n)}</p><h3>${esc(q.h)}</h3>`;
+    if(q.input){h+=`<form class="q-field" id="q-form"><label for="q-in" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">${esc(q.input)}</label><input id="q-in" maxlength="60" autocomplete="name" placeholder="${esc(q.input)}" value="${esc(st.a.name||'')}" dir="auto"><button class="q-wa" type="submit">${esc(L.next)}</button></form>`}
+    else{h+='<div class="q-opts">'+q.o.map((o,j)=>{const t=Array.isArray(o)?o[0]:o,ic=Array.isArray(o)?I[o[1]]:'';return `<button type="button" class="q-opt${st.ix[q.k]===j?' on':''}" data-j="${j}">${ic}<span>${esc(t)}</span></button>`}).join('')+'</div>'}
+    h+=`<div class="q-nav">${st.i>0?`<button type="button" class="q-back" id="q-back">← ${esc(L.back)}</button>`:'<span></span>'}</div></div>`;
+    card.innerHTML=h;
+    card.querySelectorAll('.q-opt').forEach(b=>b.addEventListener('click',()=>{
+      const j=+b.dataset.j,o=q.o[j];card.querySelectorAll('.q-opt').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+      st.ix[q.k]=j;st.a[q.k]=Array.isArray(o)?o[0]:o;if(st.i===0)track('quote_form_started',{lang:st.lang});
+      track('quote_form_answer',{step:st.i+1,question:q.k});setTimeout(()=>{st.i++;save();render()},220)}));
+    const f=$('q-form');if(f){f.addEventListener('submit',e=>{e.preventDefault();const v=$('q-in').value.trim();if(!v){$('q-in').focus();return}st.a.name=v.slice(0,60);st.i++;save();render()})}
+    const bk=$('q-back');if(bk)bk.addEventListener('click',()=>{st.i--;save();render()});
   }
-  function answer(v){
-    const L=st.lang,q=T[L].q[st.step];
-    st.a[q.k]=v.trim().slice(0,200);bubble('u',st.a[q.k]);
-    track('guided_chat_answer',{step:st.step+1,question:q.k});
-    if(st.step===0)bubble('a',T[L].thanks(st.a.name));
-    st.step++;save();
-    if(st.step<T[L].q.length)ask();else finish();
+  function result(){
+    const L=T[st.lang],k=recommend();st.a.pkg=PKG[k];save();
+    const rows=['need','type','where','budget','when'].map(x=>`<li><span>${esc(L.labels[x])}</span><b dir="auto">${esc(st.a[x])}</b></li>`).join('');
+    const href=`https://wa.me/${MANO}?text=${encodeURIComponent(L.brief(st.a))}`;
+    card.innerHTML=`<div class="q-fade"><p class="q-pkg">${esc(L.done)} · ${esc(st.a.name)}</p><h3>${PKG[k]}</h3><p class="q-why">${esc(L.why[k])} ${esc(L.note)}</p><ul class="q-sum">${rows}</ul><a class="q-wa" id="q-go" href="${href}" target="_blank" rel="noopener">${esc(L.wa)}</a><button type="button" class="q-again" id="q-again">${esc(L.again)}</button></div>`;
+    $('q-go').addEventListener('click',()=>track('quote_form_whatsapp_click',{package:PKG[k],lang:st.lang}));
+    $('q-again').addEventListener('click',()=>{st={lang:st.lang,i:0,a:{},ix:{}};save();render()});
+    track('quote_form_completed',{package:PKG[k],lang:st.lang,need:st.ix.need,budget:st.ix.budget});
   }
-  function finish(){
-    const L=st.lang,key=recommend(st.a,L),pkg=PK[key][L];
-    st.a.pkg=PK[key].en;st.done=true;save();
-    bubble('a',T[L].pick(pkg,T[L].why[key]));
-    bubble('a',T[L].tap);
-    const a=link(`https://wa.me/${MANO}?text=${encodeURIComponent(T[L].brief(st.a))}`,T[L].btn);
-    a.addEventListener('click',()=>track('guided_chat_whatsapp_click',{package:st.a.pkg,lang:L}));
-    const r=document.createElement('button');r.type='button';r.className='sa-restart';r.textContent=T[L].restart;r.addEventListener('click',restart);log.appendChild(r);
-    track('guided_chat_completed',{package:st.a.pkg,lang:L,need:st.a.need,budget:st.a.budget});
-  }
-  function start(){
-    log.textContent='';
-    bubble('a',"Hi! 👋 Which language do you prefer? · تحب نتكلم بأنهي لغة؟");
-    chips(["English","العربية"],v=>{st.lang=v==='English'?'en':'ar';st.step=0;save();bubble('u',v);bubble('a',T[st.lang].hello);ask();track('guided_chat_started',{lang:st.lang})});
-  }
-  function restart(){st={lang:null,step:-1,a:{},done:false};save();start()}
-  function replay(){ // rebuild the chat after the page reloads
-    if(!st.lang||st.step<0){start();return}
-    log.textContent='';const L=st.lang;bubble('a',T[L].hello);
-    T[L].q.slice(0,st.step).forEach((q,i)=>{bubble('a',q.text);bubble('u',st.a[q.k]);if(i===0)bubble('a',T[L].thanks(st.a.name))});
-    if(st.done){st.step=T[L].q.length;finish()}else ask();
-  }
-
-  function open(v){panel.classList.toggle('open',v);panel.setAttribute('aria-hidden',v?'false':'true');launch.setAttribute('aria-expanded',v?'true':'false');launch.style.visibility=v?'hidden':'visible';
-    if(v){if(!log.childElementCount)replay();setTimeout(()=>inp.focus(),250);track('guided_chat_opened',{})}}
-  launch.addEventListener('click',()=>open(true));$('sa-x').addEventListener('click',()=>open(false));
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&panel.classList.contains('open'))open(false)});
-  inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();form.requestSubmit()}});
-  inp.addEventListener('input',()=>{inp.style.height='44px';inp.style.height=Math.min(120,inp.scrollHeight)+'px'});
-  form.addEventListener('submit',e=>{
-    e.preventDefault();const v=inp.value.trim();if(!v)return;inp.value='';inp.style.height='44px';
-    if(!st.lang){st.lang=/[؀-ۿ]/.test(v)?'ar':'en';st.step=0;save();log.querySelectorAll('.sa-chips').forEach(c=>c.remove());bubble('u',v);bubble('a',T[st.lang].hello);ask();return}
-    if(st.done){bubble('u',v);bubble('a',st.lang==='ar'?'تمام! دوس على زرار الواتساب فوق ومانو هيرد عليك.':'Got it! Tap the WhatsApp button above and Mano will reply.');return}
-    log.querySelectorAll('.sa-chips').forEach(c=>c.remove());answer(v);
-  });
+  $('q-lang').addEventListener('click',()=>{const keep=st.i;st.lang=st.lang==='ar'?'en':'ar';
+    // re-label the stored answers in the new language
+    const L=T[st.lang];L.q.forEach(q=>{if(q.o&&st.ix[q.k]!==undefined){const o=q.o[st.ix[q.k]];st.a[q.k]=Array.isArray(o)?o[0]:o}});st.i=keep;save();render()});
+  // the corner button hides once the form is on screen
+  new IntersectionObserver(es=>launch.classList.toggle('hide',es[0].isIntersecting),{threshold:.2}).observe(sec);
+  render();
 })();
 </script>
-<!-- End Sanad assistant -->
+<!-- End Sanad quote form -->
 
 </body>
 </html>
