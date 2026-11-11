@@ -456,7 +456,8 @@ body.flat .after{padding-top:8rem;background:none}
   }
   // touch: hold the page still while the finger moves, then step once on release
   let ty0=null,tx0=0,moved=false;
-  addEventListener('touchstart',e=>{if(!inTour()||e.touches.length>1){ty0=null;return}ty0=e.touches[0].clientY;tx0=e.touches[0].clientX;moved=false},{passive:true});
+  const inChat=t=>!!(t&&t.closest&&t.closest('#sa-panel,#sa-launch'));
+  addEventListener('touchstart',e=>{if(!inTour()||e.touches.length>1||inChat(e.target)){ty0=null;return}ty0=e.touches[0].clientY;tx0=e.touches[0].clientX;moved=false},{passive:true});
   addEventListener('touchmove',e=>{
     if(ty0===null)return;
     const dy=e.touches[0].clientY-ty0;
@@ -472,7 +473,7 @@ body.flat .after{padding-top:8rem;background:none}
   // wheel and trackpad: one step per flick, ignoring the trailing inertia
   let acc=0;
   addEventListener('wheel',e=>{
-    if(!inTour())return;
+    if(!inTour()||inChat(e.target))return;
     const leavingTop=e.deltaY<0&&fNow()<.02;
     if(leavingTop)return;
     e.preventDefault();
@@ -482,11 +483,95 @@ body.flat .after{padding-top:8rem;background:none}
     if(Math.abs(acc)>30){go(acc>0?1:-1);acc=0;quietUntil=now+650}
   },{passive:false});
   addEventListener('keydown',e=>{
-    if(!inTour())return;
+    if(!inTour()||inChat(e.target)||/^(INPUT|TEXTAREA)$/.test(e.target.tagName))return;
     if(['ArrowDown','PageDown',' '].includes(e.key)){e.preventDefault();go(1)}
     else if(['ArrowUp','PageUp'].includes(e.key)){e.preventDefault();go(-1)}
   });
 })();
 </script>
+<!-- Sanad assistant: website chat that hands real leads to Mano on WhatsApp -->
+<style>
+.sa-launch{position:fixed;z-index:40;right:max(18px,env(safe-area-inset-right,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:.6rem;padding:.85rem 1.15rem;border:1px solid rgba(236,231,221,.35);background:rgba(10,10,12,.82);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:var(--ink);font:500 .72rem var(--sans);letter-spacing:.2em;text-transform:uppercase;cursor:pointer;border-radius:999px;transition:border-color .3s,transform .3s}
+.sa-launch:hover{border-color:var(--gold);transform:translateY(-2px)}
+.sa-launch i{width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 10px var(--gold)}
+.sa-panel{position:fixed;z-index:41;right:max(18px,env(safe-area-inset-right,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));width:min(380px,calc(100vw - 36px));height:min(560px,calc(100vh - 120px));display:flex;flex-direction:column;background:rgba(10,10,12,.94);border:1px solid rgba(236,231,221,.16);box-shadow:0 30px 80px rgba(0,0,0,.6);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);opacity:0;transform:translateY(16px);pointer-events:none;transition:opacity .3s,transform .3s}
+.sa-panel.open{opacity:1;transform:none;pointer-events:auto}
+.sa-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1rem 1.1rem;border-bottom:1px solid var(--faint)}
+.sa-head b{display:block;font:400 1rem var(--serif);letter-spacing:.08em;text-transform:uppercase}
+.sa-head small{font:400 .66rem var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--mut)}
+.sa-x{background:none;border:1px solid var(--faint);color:var(--ink);width:34px;height:34px;border-radius:50%;cursor:pointer;font:300 1rem var(--sans)}
+.sa-x:hover{border-color:var(--gold)}
+.sa-log{flex:1;overflow-y:auto;padding:1rem 1.1rem;display:flex;flex-direction:column;gap:.7rem;overscroll-behavior:contain}
+.sa-m{max-width:85%;padding:.65rem .85rem;font:300 .92rem/1.5 var(--sans);white-space:pre-wrap;word-wrap:break-word}
+.sa-m.a{align-self:flex-start;background:rgba(236,231,221,.07);border:1px solid var(--faint)}
+.sa-m.u{align-self:flex-end;background:var(--ink);color:#0b0b0d}
+.sa-m.note{align-self:center;max-width:100%;background:none;border:0;color:var(--mut);font-size:.8rem;text-align:center}
+.sa-dots{align-self:flex-start;display:flex;gap:4px;padding:.8rem .9rem}
+.sa-dots span{width:6px;height:6px;border-radius:50%;background:var(--mut);animation:sad 1.2s infinite ease-in-out}
+.sa-dots span:nth-child(2){animation-delay:.15s}.sa-dots span:nth-child(3){animation-delay:.3s}
+@keyframes sad{0%,80%,100%{opacity:.25}40%{opacity:1}}
+.sa-wa{display:block;margin:.2rem 0 .3rem;padding:.9rem 1rem;border:1px solid var(--gold);color:var(--gold);font:500 .74rem var(--sans);letter-spacing:.18em;text-transform:uppercase;text-align:center;transition:background .3s,color .3s}
+.sa-wa:hover{background:var(--gold);color:#0b0b0d}
+.sa-form{display:flex;gap:.5rem;padding:.8rem;border-top:1px solid var(--faint)}
+.sa-form textarea{flex:1;min-width:0;resize:none;height:44px;max-height:120px;padding:.7rem .8rem;background:rgba(236,231,221,.05);border:1px solid var(--faint);color:var(--ink);font:300 .92rem/1.4 var(--sans)}
+.sa-form textarea:focus{outline:none;border-color:rgba(236,231,221,.4)}
+.sa-form button{flex:none;padding:0 1rem;border:1px solid var(--ink);background:var(--ink);color:#0b0b0d;font:500 .7rem var(--sans);letter-spacing:.18em;text-transform:uppercase;cursor:pointer}
+.sa-form button:disabled{opacity:.4;cursor:default}
+@media (max-width:760px){
+  .sa-launch{padding:.75rem 1rem}
+  .sa-panel{right:0;left:0;bottom:0;width:auto;height:min(78vh,620px);border-left:0;border-right:0;border-bottom:0;padding-bottom:env(safe-area-inset-bottom,0px)}
+}
+@media (prefers-reduced-motion:reduce){.sa-panel,.sa-launch{transition:none}.sa-dots span{animation:none}}
+</style>
+<button class="sa-launch" id="sa-launch" type="button" aria-controls="sa-panel" aria-expanded="false"><i></i>Chat with us</button>
+<section class="sa-panel" id="sa-panel" role="dialog" aria-label="Chat with Sanad" aria-hidden="true">
+  <div class="sa-head"><div><b>Sanad Assistant</b><small>Replies instantly</small></div><button class="sa-x" id="sa-x" type="button" aria-label="Close chat">✕</button></div>
+  <div class="sa-log" id="sa-log" aria-live="polite"></div>
+  <form class="sa-form" id="sa-form"><label for="sa-in" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Your message</label><textarea id="sa-in" rows="1" maxlength="1200" placeholder="Tell us about your brand…"></textarea><button id="sa-send" type="submit">Send</button></form>
+</section>
+<script>
+(function(){
+  // Address of the private assistant service. Empty until it is deployed: the chat then explains it is coming soon.
+  const ASSISTANT_URL='';
+  const WA='https://wa.me/201555689445?text='+encodeURIComponent("Hi Mano, I'd like to talk about my brand.");
+  const $=id=>document.getElementById(id),panel=$('sa-panel'),log=$('sa-log'),form=$('sa-form'),inp=$('sa-in'),send=$('sa-send'),launch=$('sa-launch');
+  const track=(e,p)=>{try{window.posthog&&posthog.capture&&posthog.capture(e,p)}catch(_){}};
+  const KEY='sanad-assistant-v1';
+  let state={turns:[],handoff:null};
+  try{const s=JSON.parse(sessionStorage.getItem(KEY)||'null');if(s&&Array.isArray(s.turns))state=s}catch(_){}
+  const save=()=>{try{sessionStorage.setItem(KEY,JSON.stringify(state))}catch(_){}};
+  function bubble(cls,text){const d=document.createElement('div');d.className='sa-m '+cls;d.textContent=text;log.appendChild(d);log.scrollTop=log.scrollHeight;return d}
+  function waButton(href){const a=document.createElement('a');a.className='sa-wa';a.href=href;a.target='_blank';a.rel='noopener';a.textContent='Continue with Mano on WhatsApp →';
+    a.addEventListener('click',()=>track('assistant_whatsapp_click',{package:state.handoff&&state.handoff.package}));log.appendChild(a);log.scrollTop=log.scrollHeight}
+  function render(){log.textContent='';
+    bubble('a',"Hi! I'm Sanad's assistant 👋 Tell me about your brand, or ask about our packages. اكتب بالعربي لو تحب.");
+    state.turns.forEach(t=>bubble(t.role==='user'?'u':'a',t.content));
+    if(state.handoff)waButton(state.handoff.whatsapp)}
+  function open(v){panel.classList.toggle('open',v);panel.setAttribute('aria-hidden',v?'false':'true');launch.setAttribute('aria-expanded',v?'true':'false');launch.style.visibility=v?'hidden':'visible';
+    if(v){render();setTimeout(()=>inp.focus(),250);track('assistant_opened',{})}}
+  launch.addEventListener('click',()=>open(true));$('sa-x').addEventListener('click',()=>open(false));
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&panel.classList.contains('open'))open(false)});
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();form.requestSubmit()}});
+  inp.addEventListener('input',()=>{inp.style.height='44px';inp.style.height=Math.min(120,inp.scrollHeight)+'px'});
+  form.addEventListener('submit',async e=>{
+    e.preventDefault();const text=inp.value.trim();if(!text||send.disabled)return;
+    inp.value='';inp.style.height='44px';state.turns.push({role:'user',content:text});save();bubble('u',text);
+    track('assistant_message',{turn:state.turns.filter(t=>t.role==='user').length});
+    if(!ASSISTANT_URL){bubble('note','The assistant is being set up. For now, message Mano directly:');waButton(WA);state.turns.pop();save();return}
+    send.disabled=true;const dots=document.createElement('div');dots.className='sa-dots';dots.innerHTML='<span></span><span></span><span></span>';log.appendChild(dots);log.scrollTop=log.scrollHeight;
+    try{
+      const r=await fetch(ASSISTANT_URL+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:state.turns})});
+      const data=await r.json().catch(()=>({}));dots.remove();
+      if(!r.ok||!data.reply){state.turns.pop();save();bubble('note',data.error||'Something went wrong. You can message Mano on WhatsApp:');waButton(WA);return}
+      state.turns.push({role:'assistant',content:data.reply});bubble('a',data.reply);
+      if(data.handoff&&!state.handoff){state.handoff=data.handoff;waButton(data.handoff.whatsapp);track('assistant_handoff',{package:data.handoff.package,alerted:data.handoff.alerted})}
+      save();
+    }catch(_){dots.remove();state.turns.pop();save();bubble('note','Connection problem. You can message Mano on WhatsApp:');waButton(WA)}
+    finally{send.disabled=false}
+  });
+})();
+</script>
+<!-- End Sanad assistant -->
+
 </body>
 </html>

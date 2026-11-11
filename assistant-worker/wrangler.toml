@@ -1,0 +1,17 @@
+# Sanad website assistant: proxies the website chat to Claude and alerts Mano about real leads.
+name = "sanad-assistant"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+# Pages allowed to call the assistant (comma separated)
+ALLOWED_ORIGINS = "https://sanad-strategies.com,https://www.sanad-strategies.com,https://sanad-strategies.github.io"
+# Mano's WhatsApp, in international format without "+"
+MANO_WHATSAPP = "201555689445"
+
+# Secrets (set with `wrangler secret put NAME`, never committed):
+#   ANTHROPIC_API_KEY   Claude API key
+#   One alert channel:
+#     TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID   (Telegram alerts)
+#     RESEND_API_KEY + ALERT_EMAIL            (email alerts)
