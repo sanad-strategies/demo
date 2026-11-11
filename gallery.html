@@ -551,53 +551,127 @@ body.flat .after{padding-top:8rem;background:none}
   .sa-launch{padding:.75rem 1rem}
   .sa-panel{right:0;left:0;bottom:0;width:auto;height:min(78vh,620px);border-left:0;border-right:0;border-bottom:0;padding-bottom:env(safe-area-inset-bottom,0px)}
 }
+.sa-chips{display:flex;flex-wrap:wrap;gap:.45rem;align-self:stretch}
+.sa-chips button{padding:.55rem .8rem;border:1px solid rgba(201,164,92,.55);background:none;color:var(--ink);font:400 .85rem var(--sans);cursor:pointer;transition:background .2s,color .2s}
+.sa-chips button:hover,.sa-chips button:focus-visible{background:var(--gold);color:#0b0b0d}
+.sa-chips .note{flex-basis:100%;text-align:left;padding:0;margin-top:.1rem}
+.sa-restart{align-self:center;background:none;border:0;color:var(--mut);font:400 .7rem var(--sans);letter-spacing:.18em;text-transform:uppercase;cursor:pointer;text-decoration:underline}
 @media (prefers-reduced-motion:reduce){.sa-panel,.sa-launch{transition:none}.sa-dots span{animation:none}}
 </style>
 <button class="sa-launch" id="sa-launch" type="button" aria-controls="sa-panel" aria-expanded="false"><i></i>Chat with us</button>
 <section class="sa-panel" id="sa-panel" role="dialog" aria-label="Chat with Sanad" aria-hidden="true">
-  <div class="sa-head"><div><b>Sanad Assistant</b><small>Replies instantly</small></div><button class="sa-x" id="sa-x" type="button" aria-label="Close chat">✕</button></div>
+  <div class="sa-head"><div><b>Sanad Assistant</b><small>Six quick questions</small></div><button class="sa-x" id="sa-x" type="button" aria-label="Close chat">✕</button></div>
   <div class="sa-log" id="sa-log" aria-live="polite"></div>
-  <form class="sa-form" id="sa-form"><label for="sa-in" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Your message</label><textarea id="sa-in" rows="1" maxlength="1200" placeholder="Tell us about your brand…"></textarea><button id="sa-send" type="submit">Send</button></form>
+  <form class="sa-form" id="sa-form"><label for="sa-in" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Your message</label><textarea id="sa-in" rows="1" maxlength="1200" placeholder="Type your answer…"></textarea><button id="sa-send" type="submit">Send</button></form>
 </section>
 <script>
+/* Sanad guided chat: six short questions, a package suggestion, then WhatsApp with the brief.
+   Runs entirely in the browser: no AI, no server, no cost. */
 (function(){
-  // Address of the private assistant service. Empty until it is deployed: the chat then explains it is coming soon.
-  const ASSISTANT_URL='';
-  const WA='https://wa.me/201555689445?text='+encodeURIComponent("Hi Mano, I'd like to talk about my brand.");
+  const MANO='201555689445';
   const $=id=>document.getElementById(id),panel=$('sa-panel'),log=$('sa-log'),form=$('sa-form'),inp=$('sa-in'),send=$('sa-send'),launch=$('sa-launch');
   const track=(e,p)=>{try{window.posthog&&posthog.capture&&posthog.capture(e,p)}catch(_){}};
-  const KEY='sanad-assistant-v1';
-  let state={turns:[],handoff:null};
-  try{const s=JSON.parse(sessionStorage.getItem(KEY)||'null');if(s&&Array.isArray(s.turns))state=s}catch(_){}
-  const save=()=>{try{sessionStorage.setItem(KEY,JSON.stringify(state))}catch(_){}};
-  function bubble(cls,text){const d=document.createElement('div');d.className='sa-m '+cls;d.textContent=text;log.appendChild(d);log.scrollTop=log.scrollHeight;return d}
-  function waButton(href){const a=document.createElement('a');a.className='sa-wa';a.href=href;a.target='_blank';a.rel='noopener';a.textContent='Continue with Mano on WhatsApp →';
-    a.addEventListener('click',()=>track('assistant_whatsapp_click',{package:state.handoff&&state.handoff.package}));log.appendChild(a);log.scrollTop=log.scrollHeight}
-  function render(){log.textContent='';
-    bubble('a',"Hi! I'm Sanad's assistant 👋 Tell me about your brand, or ask about our packages. اكتب بالعربي لو تحب.");
-    state.turns.forEach(t=>bubble(t.role==='user'?'u':'a',t.content));
-    if(state.handoff)waButton(state.handoff.whatsapp)}
+  const T={
+    en:{hello:"Hi! I'm Sanad's assistant 👋 Six quick questions and I'll point you to the right package, then Mano takes it from there.",
+      q:[
+        {k:'name',text:"What should we call you? Your name or your brand's name, either is fine."},
+        {k:'product',text:"What do you sell?",ph:"e.g. handmade silver rings"},
+        {k:'where',text:"Where do you sell it?",opts:["Instagram","My own website","A physical shop","Not launched yet"]},
+        {k:'need',text:"What do you need help with?",opts:["Brand identity","Product photography","A website","A mix of these","Not sure yet"]},
+        {k:'budget',text:"Roughly what budget do you have in mind?",opts:["Under 2,500 EGP","2,500 – 6,000 EGP","6,000 – 10,000 EGP","Not sure yet"]},
+        {k:'when',text:"When would you like it ready?",opts:["As soon as possible","This month","In 1–3 months","Just exploring"]}],
+      thanks:n=>`Thanks, ${n}!`,
+      pick:(p,why)=>`Based on what you told me, ${p} fits best. ${why} Mano will confirm the exact scope and price with you.`,
+      why:{first:"It's one focused piece done properly, a great first step.",glow:"It brings two pieces together, usually what moves the needle for a growing brand.",full:"It builds identity, photography and a website as one system from day one."},
+      tap:"Tap below to send Mano your brief on WhatsApp. He'll reply personally.",
+      btn:"Continue with Mano on WhatsApp →",restart:"Start over",ph:"Type your answer…",or:"or type your own answer below",
+      brief:a=>`Hi Mano, I'm ${a.name}. I sell ${a.product} (${a.where}). I need: ${a.need}. Budget: ${a.budget}. Timeline: ${a.when}. Your website suggested ${a.pkg}.`},
+    ar:{hello:"أهلاً! أنا مساعد سند 👋 ست أسئلة سريعة وهقولك الباكدج المناسبة، وبعدها مانو هيكمل معاك.",
+      q:[
+        {k:'name',text:"نقولك إيه؟ اسمك أو اسم البراند، أي واحد فيهم."},
+        {k:'product',text:"بتبيع إيه؟",ph:"مثلاً: خواتم فضة هاند ميد"},
+        {k:'where',text:"بتبيع فين؟",opts:["إنستجرام","موقعي الخاص","محل","لسه مبدأتش"]},
+        {k:'need',text:"محتاج مساعدة في إيه؟",opts:["هوية للبراند","تصوير منتجات","موقع إلكتروني","أكتر من حاجة","لسه مش متأكد"]},
+        {k:'budget',text:"الميزانية في حدود كام تقريباً؟",opts:["أقل من 2,500 جنيه","2,500 – 6,000 جنيه","6,000 – 10,000 جنيه","لسه مش متأكد"]},
+        {k:'when',text:"عايزه يكون جاهز إمتى؟",opts:["في أسرع وقت","الشهر ده","خلال شهر لـ 3 شهور","بستكشف بس"]}],
+      thanks:n=>`شكراً يا ${n}!`,
+      pick:(p,why)=>`على حسب كلامك، أنسب باكدج ليك هي ${p}. ${why} مانو هيأكد معاك التفاصيل والسعر النهائي.`,
+      why:{first:"حاجة واحدة معمولة صح، بداية ممتازة.",glow:"بتجمع حاجتين مع بعض، ودي غالباً اللي بتفرق مع البراند اللي بيكبر.",full:"بتبني الهوية والتصوير والموقع كنظام واحد من الأول."},
+      tap:"دوس تحت عشان تبعت لمانو ملخص طلبك على واتساب، وهو هيرد عليك بنفسه.",
+      btn:"كمّل مع مانو على واتساب ←",restart:"ابدأ من الأول",ph:"اكتب إجابتك…",or:"أو اكتب إجابتك تحت",
+      brief:a=>`أهلاً يا مانو، أنا ${a.name}. ببيع ${a.product} (${a.where}). محتاج: ${a.need}. الميزانية: ${a.budget}. الوقت: ${a.when}. الموقع رشحلي ${a.pkg}.`}
+  };
+  const PK={first:{en:"First Time Offer",ar:"First Time Offer"},glow:{en:"Glow Up",ar:"Glow Up"},full:{en:"From A to Success",ar:"From A to Success"}};
+  const KEY='sanad-guided-v1';
+  let st={lang:null,step:-1,a:{},done:false};
+  try{const s=JSON.parse(sessionStorage.getItem(KEY)||'null');if(s&&typeof s.step==='number')st=s}catch(_){}
+  const save=()=>{try{sessionStorage.setItem(KEY,JSON.stringify(st))}catch(_){}};
+
+  function bubble(cls,text){const d=document.createElement('div');d.className='sa-m '+cls;d.dir='auto';d.textContent=text;log.appendChild(d);log.scrollTop=log.scrollHeight;return d}
+  function chips(list,onPick,hint){const w=document.createElement('div');w.className='sa-chips';
+    list.forEach(o=>{const b=document.createElement('button');b.type='button';b.textContent=o;b.dir='auto';b.addEventListener('click',()=>{w.remove();onPick(o)});w.appendChild(b)});
+    log.appendChild(w);if(hint){const h=document.createElement('div');h.className='sa-m note';h.textContent=hint;w.appendChild(h)}log.scrollTop=log.scrollHeight}
+  function link(href,text,cls){const a=document.createElement('a');a.className=cls||'sa-wa';a.href=href;a.target='_blank';a.rel='noopener';a.textContent=text;log.appendChild(a);log.scrollTop=log.scrollHeight;return a}
+
+  // which package fits: by what they need, then by budget
+  function recommend(a,L){
+    const q=T[L].q, need=q[3].opts.indexOf(a.need), bud=q[4].opts.indexOf(a.budget);
+    const byBudget=bud===0?'first':bud===1?'glow':bud===2?'full':null;
+    if(need===2)return bud===2?'full':'glow';           // website: at least identity + website
+    if(need===3)return bud===2?'full':'glow';           // a mix
+    if(need===0||need===1)return bud===2?'glow':'first'; // one piece; bigger budget gets two
+    return byBudget||'glow';                            // not sure / typed answer
+  }
+
+  function ask(){
+    const L=st.lang,q=T[L].q[st.step];
+    bubble('a',q.text);
+    inp.placeholder=q.ph||T[L].ph;inp.dir='auto';
+    if(q.opts)chips(q.opts,v=>answer(v),T[L].or);
+    setTimeout(()=>inp.focus(),50);
+  }
+  function answer(v){
+    const L=st.lang,q=T[L].q[st.step];
+    st.a[q.k]=v.trim().slice(0,200);bubble('u',st.a[q.k]);
+    track('guided_chat_answer',{step:st.step+1,question:q.k});
+    if(st.step===0)bubble('a',T[L].thanks(st.a.name));
+    st.step++;save();
+    if(st.step<T[L].q.length)ask();else finish();
+  }
+  function finish(){
+    const L=st.lang,key=recommend(st.a,L),pkg=PK[key][L];
+    st.a.pkg=PK[key].en;st.done=true;save();
+    bubble('a',T[L].pick(pkg,T[L].why[key]));
+    bubble('a',T[L].tap);
+    const a=link(`https://wa.me/${MANO}?text=${encodeURIComponent(T[L].brief(st.a))}`,T[L].btn);
+    a.addEventListener('click',()=>track('guided_chat_whatsapp_click',{package:st.a.pkg,lang:L}));
+    const r=document.createElement('button');r.type='button';r.className='sa-restart';r.textContent=T[L].restart;r.addEventListener('click',restart);log.appendChild(r);
+    track('guided_chat_completed',{package:st.a.pkg,lang:L,need:st.a.need,budget:st.a.budget});
+  }
+  function start(){
+    log.textContent='';
+    bubble('a',"Hi! 👋 Which language do you prefer? · تحب نتكلم بأنهي لغة؟");
+    chips(["English","العربية"],v=>{st.lang=v==='English'?'en':'ar';st.step=0;save();bubble('u',v);bubble('a',T[st.lang].hello);ask();track('guided_chat_started',{lang:st.lang})});
+  }
+  function restart(){st={lang:null,step:-1,a:{},done:false};save();start()}
+  function replay(){ // rebuild the chat after the page reloads
+    if(!st.lang||st.step<0){start();return}
+    log.textContent='';const L=st.lang;bubble('a',T[L].hello);
+    T[L].q.slice(0,st.step).forEach((q,i)=>{bubble('a',q.text);bubble('u',st.a[q.k]);if(i===0)bubble('a',T[L].thanks(st.a.name))});
+    if(st.done){st.step=T[L].q.length;finish()}else ask();
+  }
+
   function open(v){panel.classList.toggle('open',v);panel.setAttribute('aria-hidden',v?'false':'true');launch.setAttribute('aria-expanded',v?'true':'false');launch.style.visibility=v?'hidden':'visible';
-    if(v){render();setTimeout(()=>inp.focus(),250);track('assistant_opened',{})}}
+    if(v){if(!log.childElementCount)replay();setTimeout(()=>inp.focus(),250);track('guided_chat_opened',{})}}
   launch.addEventListener('click',()=>open(true));$('sa-x').addEventListener('click',()=>open(false));
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&panel.classList.contains('open'))open(false)});
   inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();form.requestSubmit()}});
   inp.addEventListener('input',()=>{inp.style.height='44px';inp.style.height=Math.min(120,inp.scrollHeight)+'px'});
-  form.addEventListener('submit',async e=>{
-    e.preventDefault();const text=inp.value.trim();if(!text||send.disabled)return;
-    inp.value='';inp.style.height='44px';state.turns.push({role:'user',content:text});save();bubble('u',text);
-    track('assistant_message',{turn:state.turns.filter(t=>t.role==='user').length});
-    if(!ASSISTANT_URL){bubble('note','The assistant is being set up. For now, message Mano directly:');waButton(WA);state.turns.pop();save();return}
-    send.disabled=true;const dots=document.createElement('div');dots.className='sa-dots';dots.innerHTML='<span></span><span></span><span></span>';log.appendChild(dots);log.scrollTop=log.scrollHeight;
-    try{
-      const r=await fetch(ASSISTANT_URL+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:state.turns,handedOver:!!state.handoff})});
-      const data=await r.json().catch(()=>({}));dots.remove();
-      if(!r.ok||!data.reply){state.turns.pop();save();bubble('note',data.error||'Something went wrong. You can message Mano on WhatsApp:');waButton(WA);return}
-      state.turns.push({role:'assistant',content:data.reply});bubble('a',data.reply);
-      if(data.handoff&&!state.handoff){state.handoff=data.handoff;waButton(data.handoff.whatsapp);track('assistant_handoff',{package:data.handoff.package,alerted:data.handoff.alerted})}
-      save();
-    }catch(_){dots.remove();state.turns.pop();save();bubble('note','Connection problem. You can message Mano on WhatsApp:');waButton(WA)}
-    finally{send.disabled=false}
+  form.addEventListener('submit',e=>{
+    e.preventDefault();const v=inp.value.trim();if(!v)return;inp.value='';inp.style.height='44px';
+    if(!st.lang){st.lang=/[؀-ۿ]/.test(v)?'ar':'en';st.step=0;save();log.querySelectorAll('.sa-chips').forEach(c=>c.remove());bubble('u',v);bubble('a',T[st.lang].hello);ask();return}
+    if(st.done){bubble('u',v);bubble('a',st.lang==='ar'?'تمام! دوس على زرار الواتساب فوق ومانو هيرد عليك.':'Got it! Tap the WhatsApp button above and Mano will reply.');return}
+    log.querySelectorAll('.sa-chips').forEach(c=>c.remove());answer(v);
   });
 })();
 </script>
